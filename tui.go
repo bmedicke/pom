@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os/exec"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
@@ -10,12 +12,18 @@ import (
 )
 
 const (
-	pomodoroDuration time.Duration = time.Minute * 20
-	breakDuration    time.Duration = time.Minute * 5
+	pomodoroDuration time.Duration = time.Second * 2
+	breakDuration    time.Duration = time.Second * 2
 )
 
 func spawnTUI() {
 	app := tview.NewApplication()
+	pom := createPomodoro(pomodoroDuration, breakDuration)
+	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
+
+	// TODO: read chordmap from json file (compile it into binary).
+	chordmap := map[string]interface{}{}
+	chordmap["c"] = map[string]interface{}{"c": "continue"}
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	frame := tview.NewFrame(layout)
@@ -48,17 +56,6 @@ func spawnTUI() {
 
 	body.SetSelectable(true, true)
 
-	updateBody(body)
-
-	pom := createPomodoro(pomodoroDuration, breakDuration)
-	go handlePomodoroState(&pom)
-	go updateHeader(headerleft, headercenter, headerright, &pom)
-
-	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
-	// TODO: read chordmap from json file (compile it into binary).
-	chordmap := map[string]interface{}{}
-	chordmap["c"] = map[string]interface{}{"c": "continue"}
-
 	app.SetInputCapture(
 		func(event *tcell.EventKey) *tcell.EventKey {
 			if event.Key() == tcell.KeyEsc {
@@ -83,6 +80,10 @@ func spawnTUI() {
 		},
 	)
 
+	updateBody(body)
+	go handlePomodoroState(&pom)
+	go updateHeader(headerleft, headercenter, headerright, &pom)
+
 	app.SetRoot(frame, true)
 	app.SetFocus(body).Run()
 }
@@ -98,6 +99,7 @@ type Pomodoro struct {
 	BreakStopTime  time.Time
 	BreakDuration  time.Duration
 	Waiting        bool
+	CurrentTask    string
 }
 
 func createPomodoro(
@@ -115,6 +117,7 @@ func createPomodoro(
 }
 
 func handlePomodoroState(pom *Pomodoro) {
+	// this is the only place where the pomodoro should be changed!
 	// create commandChannel:
 	// listen to start/stop events from:
 	// main app & http API
@@ -124,13 +127,14 @@ func handlePomodoroState(pom *Pomodoro) {
 		}
 		switch (*pom).State {
 		case "ready":
-			// trigger this manually.
+			executeShellCallback("callbacks/work_start.sh")
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).PomDuration - delta
 			if remaining <= 0 {
+				executeShellCallback("callbacks/work_done.sh")
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).Waiting = true
@@ -139,13 +143,14 @@ func handlePomodoroState(pom *Pomodoro) {
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			// trigger this manually.
-			(*pom).BreakStartTime = time.Now()
+			executeShellCallback("callbacks/break_start.sh")
 			(*pom).State = "break"
+			(*pom).BreakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).BreakStartTime)
 			remaining := (*pom).BreakDuration - delta
 			if remaining <= 0 {
+				executeShellCallback("callbacks/break_done.sh")
 				(*pom).State = "break_done"
 				(*pom).BreakStopTime = time.Now()
 				(*pom).DurationLeft = pomodoroDuration
@@ -200,9 +205,12 @@ func attachTicker(timer chan time.Time) {
 
 func handleAction(action string, pom *Pomodoro) {
 	switch action {
+	// only
 	case "continue":
 		// TODO send signal instead of mutating state directly!
 		(*pom).Waiting = false
+	case "cancel":
+		// TODO send cancel (break or pomodoro) message
 	}
 }
 
@@ -234,5 +242,12 @@ func updateHeader(
 		left.SetBackgroundColor(color)
 		center.SetBackgroundColor(color)
 		right.SetBackgroundColor(color)
+	}
+}
+
+func executeShellCallback(script string) {
+	_, err := exec.Command(script).Output()
+	if err != nil {
+		log.Panic(err)
 	}
 }
