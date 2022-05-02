@@ -74,7 +74,7 @@ func spawnTUI() {
 				switch event.Rune() {
 				case 'q':
 					app.Stop()
-				case 'c':
+				case 'c', 'd':
 					if err := util.HandleChords(event.Rune(), &chord, chordmap); err != nil {
 						statusbar.SetText(fmt.Sprint(err))
 					}
@@ -210,12 +210,14 @@ func attachTicker(timer chan time.Time) {
 
 func handleAction(action string, pom *Pomodoro) {
 	switch action {
-	// only
 	case "continue":
 		// TODO send signal instead of mutating state directly!
 		(*pom).Waiting = false
+	case "create_pomodoro":
+	case "create_break":
 	case "cancel":
-		// TODO send cancel (break or pomodoro) message
+	case "delete_pomodoro":
+	case "delete_break":
 	}
 }
 

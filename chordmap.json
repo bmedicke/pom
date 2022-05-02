@@ -1,5 +1,12 @@
 {
   "c": {
-    "c": "continue"
+    "c": "continue",
+    "p": "create_pomodoro",
+    "b": "create_break"
+  },
+  "d": {
+    "d": "cancel",
+    "p": "delete_pomodoro",
+    "b": "delete_pomodoro"
   }
 }
