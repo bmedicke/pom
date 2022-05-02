@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "embed"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,6 +14,9 @@ import (
 	"github.com/rivo/tview"
 )
 
+//go:embed chordmap.json
+var chordmapJSON string
+
 const (
 	pomodoroDuration time.Duration = time.Minute * 25
 	breakDuration    time.Duration = time.Minute * 5
@@ -22,9 +27,8 @@ func spawnTUI() {
 	pom := createPomodoro(pomodoroDuration, breakDuration)
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 
-	// TODO: read chordmap from json file (compile it into binary).
 	chordmap := map[string]interface{}{}
-	chordmap["c"] = map[string]interface{}{"c": "continue"}
+	json.Unmarshal([]byte(chordmapJSON), &chordmap)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	frame := tview.NewFrame(layout)
