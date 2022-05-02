@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
@@ -12,8 +13,9 @@ import (
 )
 
 const (
-	pomodoroDuration time.Duration = time.Second * 2
-	breakDuration    time.Duration = time.Second * 2
+	pomodoroDuration time.Duration = time.Minute * 25
+	breakDuration    time.Duration = time.Minute * 5
+	callbackfolder   string        = ".pom/callbacks"
 )
 
 func spawnTUI() {
@@ -127,14 +129,14 @@ func handlePomodoroState(pom *Pomodoro) {
 		}
 		switch (*pom).State {
 		case "ready":
-			executeShellCallback("callbacks/work_start.sh")
+			executeShellCallback("work_start.sh")
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).PomDuration - delta
 			if remaining <= 0 {
-				executeShellCallback("callbacks/work_done.sh")
+				executeShellCallback("work_done.sh")
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).Waiting = true
@@ -143,14 +145,14 @@ func handlePomodoroState(pom *Pomodoro) {
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			executeShellCallback("callbacks/break_start.sh")
+			executeShellCallback("break_start.sh")
 			(*pom).State = "break"
 			(*pom).BreakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).BreakStartTime)
 			remaining := (*pom).BreakDuration - delta
 			if remaining <= 0 {
-				executeShellCallback("callbacks/break_done.sh")
+				executeShellCallback("break_done.sh")
 				(*pom).State = "break_done"
 				(*pom).BreakStopTime = time.Now()
 				(*pom).DurationLeft = pomodoroDuration
@@ -246,8 +248,7 @@ func updateHeader(
 }
 
 func executeShellCallback(script string) {
-	_, err := exec.Command(script).Output()
-	if err != nil {
-		log.Panic(err)
-	}
+	home, _ := os.UserHomeDir()
+	callbackpath := filepath.Join(home, callbackfolder, script)
+	exec.Command(callbackpath).Output()
 }
