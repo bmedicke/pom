@@ -15,7 +15,6 @@ import (
 const (
 	pomodoroDuration time.Duration = time.Minute * 25
 	breakDuration    time.Duration = time.Minute * 5
-	callbackfolder   string        = ".pom/callbacks"
 )
 
 func spawnTUI() {
