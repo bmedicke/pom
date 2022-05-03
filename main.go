@@ -44,6 +44,7 @@ func main() {
 		createConfigFilesAndFolders()
 	} else {
 		spawnTUI()
+		clearTmuxFile()
 	}
 }
 

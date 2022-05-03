@@ -8,6 +8,7 @@ a command line pomodoro timer
 * [installation](#installation)
 * [configuration](#configuration)
   * [hook profiles](#hook-profiles)
+  * [show status in tmux](#show-status-in-tmux)
 
 <!-- vim-markdown-toc -->
 
@@ -43,3 +44,14 @@ Here are a couple of example **usage scenarios** for hooks:
   * add a `work_done` and a `break_done` script to it
   * add your shell commands to toggle the light
   * start *pom* with your profile: `pom --profile light`
+
+### show status in tmux
+
+* *pom* keeps a file at `~/.pom/tmux` that always shows the current status
+
+You can `cat` this into your tmux statusline:
+
+**.tmux.conf**
+```sh
+set -g status-right "[#(cat ~/.pom/tmux)]"
+```

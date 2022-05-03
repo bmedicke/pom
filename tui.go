@@ -147,9 +147,9 @@ func updateBody(view *tview.Table) {
 }
 
 // TODO: move this to util.
-func attachTicker(timer chan time.Time) {
+func attachTicker(timer chan time.Time, interval time.Duration) {
 	timer <- time.Now() // send one tick immediately.
-	t := time.NewTicker(20 * time.Millisecond)
+	t := time.NewTicker(interval)
 	for c := range t.C {
 		timer <- c
 	}
@@ -175,7 +175,7 @@ func updateHeader(
 	pom *pomodoro,
 ) {
 	tick := make(chan time.Time)
-	go attachTicker(tick)
+	go attachTicker(tick, time.Millisecond * 200)
 
 	for {
 		<-tick

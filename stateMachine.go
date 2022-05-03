@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,7 +18,8 @@ func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
 	// TODO: listen to start/stop events from: main app & http API.
 	// TODO: listen for change-current-focus event.
 	tick := make(chan time.Time)
-	go attachTicker(tick)
+	go attachTicker(tick, time.Millisecond*200)
+	go writeTmuxFile(pom)
 
 	for {
 		<-tick
@@ -64,6 +66,39 @@ func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
 			(*pom).BreakDuration = breakDuration
 		}
 	}
+}
+
+func writeTmuxFile(pom *pomodoro) {
+	tick := make(chan time.Time)
+	go attachTicker(tick, time.Second*1)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Panic(err)
+	}
+	file := filepath.Join(home, configfolder, "tmux")
+
+	for {
+		<-tick
+		f, _ := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+		f.WriteString(
+			fmt.Sprintf(
+				"%s %s",
+				(*pom).State,
+				(*pom).DurationLeft.Round(time.Second),
+			),
+		)
+	}
+}
+
+func clearTmuxFile() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Panic(err)
+	}
+	file := filepath.Join(home, configfolder, "tmux")
+	f, _ := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f.WriteString("")
 }
 
 func executeShellHook(script string) string {
