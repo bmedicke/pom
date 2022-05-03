@@ -92,8 +92,7 @@ func spawnTUI() {
 	app.SetFocus(body).Run()
 }
 
-// Pomodoro TODO
-type Pomodoro struct {
+type pomodoro struct {
 	State          string
 	StartTime      time.Time
 	StopTime       time.Time
@@ -109,8 +108,8 @@ type Pomodoro struct {
 func createPomodoro(
 	duration time.Duration,
 	breakDuration time.Duration,
-) Pomodoro {
-	pom := Pomodoro{
+) pomodoro {
+	pom := pomodoro{
 		State:         "ready",
 		PomDuration:   duration,
 		DurationLeft:  duration,
@@ -120,10 +119,11 @@ func createPomodoro(
 	return pom
 }
 
-func handlePomodoroState(pom *Pomodoro, view *tview.TextView) {
+func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
 	// TODO: listen to start/stop events from: main app & http API.
+	// TODO: listen for change-current-focus event.
 	tick := make(chan time.Time)
 	go attachTicker(tick)
 
@@ -210,7 +210,7 @@ func attachTicker(timer chan time.Time) {
 	}
 }
 
-func handleAction(action string, pom *Pomodoro) {
+func handleAction(action string, pom *pomodoro) {
 	switch action {
 	case "continue":
 		// TODO send signal instead of mutating state directly! (commandChannel)
@@ -227,7 +227,7 @@ func updateHeader(
 	left *tview.TextView,
 	center *tview.TextView,
 	right *tview.TextView,
-	pom *Pomodoro,
+	pom *pomodoro,
 ) {
 	tick := make(chan time.Time)
 	go attachTicker(tick)
