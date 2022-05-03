@@ -1,6 +1,6 @@
 # pom
 
-a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer
+*pom* is a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer with vim keybindings, scriptable hooks and json logging.
 
 ![image](https://user-images.githubusercontent.com/173962/166444425-c2a81732-41f7-40c2-bf11-f631f38948b4.png)
 
