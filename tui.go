@@ -253,6 +253,6 @@ func updateHeader(
 
 func executeShellHook(script string) {
 	home, _ := os.UserHomeDir()
-	hookpath := filepath.Join(home, hookfolder, script)
+	hookpath := filepath.Join(home, configfolder, hookfolder, script)
 	exec.Command(hookpath).Output()
 }

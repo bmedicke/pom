@@ -12,7 +12,13 @@ import (
 
 //go:embed hooks/default.sh
 var defaultHookContent string
-var hookfolder = ".pom/hooks/"
+
+//go:embed config.json
+var defaultConfigContent string
+
+const configfolder = ".pom"
+
+var hookfolder = "hooks/"
 
 func main() {
 	createConfig := flag.Bool(
@@ -28,10 +34,11 @@ func main() {
 
 	flag.Parse()
 
+	hookfolder = filepath.Join(hookfolder, *hookProfile)
+
 	if *createConfig {
 		createConfigFilesAndFolders()
 	} else {
-		hookfolder = filepath.Join(hookfolder, *hookProfile)
 		spawnTUI()
 	}
 }
@@ -42,10 +49,20 @@ func createConfigFilesAndFolders() {
 		log.Panic(err)
 	}
 
-	hookpath := filepath.Join(home, hookfolder)
+	// create config folders:
+	hookpath := filepath.Join(home, configfolder, hookfolder)
 	err = os.MkdirAll(hookpath, 0700)
 	if err != nil {
 		log.Panic(err)
+	}
+
+	// create configfile
+	configfile := filepath.Join(home, configfolder, "config.json")
+	_, err = os.Stat(configfile)
+	if errors.Is(err, os.ErrNotExist) {
+		f, _ := os.Create(configfile)
+		f.WriteString(defaultConfigContent)
+		defer f.Close()
 	}
 
 	defaultHooks := []string{
@@ -55,6 +72,7 @@ func createConfigFilesAndFolders() {
 		"break_done.sh",
 	}
 
+	// create default hook scripts:
 	for _, hook := range defaultHooks {
 		file := filepath.Join(hookpath, hook)
 		_, err := os.Stat(file)
