@@ -36,6 +36,10 @@ func main() {
 
 	hookfolder = filepath.Join(hookfolder, *hookProfile)
 
+	// TODO: read configJSON from file.
+	// config := map[string]interface{}{}
+	// json.Unmarshal([]byte(configJSON), &config)
+
 	if *createConfig {
 		createConfigFilesAndFolders()
 	} else {

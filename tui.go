@@ -4,9 +4,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
-	"path/filepath"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
@@ -17,9 +14,10 @@ import (
 //go:embed chordmap.json
 var chordmapJSON string
 
+// TODO: read times from config.json
 const (
-	pomodoroDuration time.Duration = time.Minute * 25
-	breakDuration    time.Duration = time.Minute * 5
+	pomodoroDuration time.Duration = time.Minute * 1
+	breakDuration    time.Duration = time.Minute * 1
 )
 
 func spawnTUI() {
@@ -64,7 +62,8 @@ func spawnTUI() {
 
 	body.SetInputCapture(
 		func(event *tcell.EventKey) *tcell.EventKey {
-			if event.Key() == tcell.KeyEsc {
+			switch event.Key() {
+			case tcell.KeyEsc:
 				util.ResetChord(&chord)
 			}
 
@@ -119,61 +118,6 @@ func createPomodoro(
 	return pom
 }
 
-func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
-	// this is the only place where the pomodoro should be changed,
-	// all external changes should be triggered via channels!
-	// TODO: listen to start/stop events from: main app & http API.
-	// TODO: listen for change-current-focus event.
-	tick := make(chan time.Time)
-	go attachTicker(tick)
-
-	for {
-		<-tick
-		if (*pom).Waiting {
-			continue
-		}
-		switch (*pom).State {
-		case "ready":
-			view.SetText(executeShellHook("work_start"))
-			(*pom).State = "work"
-			(*pom).StartTime = time.Now()
-		case "work":
-			delta := time.Now().Sub((*pom).StartTime)
-			remaining := (*pom).PomDuration - delta
-			if remaining <= 0 {
-				view.SetText(executeShellHook("work_done"))
-				(*pom).State = "work_done"
-				(*pom).StopTime = time.Now()
-				(*pom).Waiting = true
-				(*pom).DurationLeft = breakDuration
-			} else {
-				(*pom).DurationLeft = remaining
-			}
-		case "work_done":
-			view.SetText(executeShellHook("break_start"))
-			(*pom).State = "break"
-			(*pom).BreakStartTime = time.Now()
-		case "break":
-			delta := time.Now().Sub((*pom).BreakStartTime)
-			remaining := (*pom).BreakDuration - delta
-			if remaining <= 0 {
-				view.SetText(executeShellHook("break_done"))
-				(*pom).State = "break_done"
-				(*pom).BreakStopTime = time.Now()
-				(*pom).DurationLeft = pomodoroDuration
-				(*pom).Waiting = true
-			} else {
-				(*pom).DurationLeft = remaining
-			}
-		case "break_done":
-			(*pom).State = "ready"
-			(*pom).PomDuration = pomodoroDuration
-			(*pom).DurationLeft = pomodoroDuration
-			(*pom).BreakDuration = breakDuration
-		}
-	}
-}
-
 func updateBody(view *tview.Table) {
 	// TODO: read-only from struct, update via commandChannel (task).
 	b := []map[string]string{
@@ -202,6 +146,7 @@ func updateBody(view *tview.Table) {
 	}
 }
 
+// TODO: move this to util.
 func attachTicker(timer chan time.Time) {
 	timer <- time.Now() // send one tick immediately.
 	t := time.NewTicker(20 * time.Millisecond)
@@ -252,14 +197,4 @@ func updateHeader(
 		center.SetBackgroundColor(color)
 		right.SetBackgroundColor(color)
 	}
-}
-
-func executeShellHook(script string) string {
-	home, _ := os.UserHomeDir()
-	hookpath := filepath.Join(home, configfolder, hookfolder, script)
-	_, err := exec.Command(hookpath).Output()
-	if err != nil {
-		return fmt.Sprintf("hook error: [%s]", err)
-	}
-	return ""
 }
