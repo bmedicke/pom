@@ -1,1 +1,4 @@
-{}
+{
+  "pomodoroDurationMinutes": 25,
+  "breakDurationMinutes": 5
+}

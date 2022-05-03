@@ -4,6 +4,9 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
@@ -14,20 +17,34 @@ import (
 //go:embed chordmap.json
 var chordmapJSON string
 
-// TODO: read times from config.json
-const (
-	pomodoroDuration time.Duration = time.Minute * 1
-	breakDuration    time.Duration = time.Minute * 1
+var (
+	pomodoroDuration time.Duration
+	breakDuration    time.Duration
 )
+
+// Config is used for unmarshalling.
+type Config struct {
+	PomodoroDurationMinutes int `json:"pomodoroDurationMinutes"`
+	BreakDurationMinutes    int `json:"breakDurationMinutes"`
+}
 
 func spawnTUI() {
 	// TODO: create commandChannel for handlePomodoroState().
 	app := tview.NewApplication()
-	pom := createPomodoro(pomodoroDuration, breakDuration)
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 
 	chordmap := map[string]interface{}{}
 	json.Unmarshal([]byte(chordmapJSON), &chordmap)
+
+	// parse config file:
+	config := getConfig()
+	pomodoroDuration = time.Duration(
+		config.PomodoroDurationMinutes,
+	) * time.Minute
+	breakDuration = time.Duration(
+		config.BreakDurationMinutes,
+	) * time.Minute
+	pom := createPomodoro(pomodoroDuration, breakDuration)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	frame := tview.NewFrame(layout)
@@ -197,4 +214,16 @@ func updateHeader(
 		center.SetBackgroundColor(color)
 		right.SetBackgroundColor(color)
 	}
+}
+
+func getConfig() Config {
+	var config Config
+	home, _ := os.UserHomeDir()
+	configpath := filepath.Join(home, configfolder, configname)
+
+	file, _ := os.Open(configpath)
+	configJSON, _ := ioutil.ReadAll(file)
+	json.Unmarshal([]byte(configJSON), &config)
+
+	return config
 }

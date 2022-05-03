@@ -17,6 +17,7 @@ var defaultHookContent string
 var defaultConfigContent string
 
 const configfolder = ".pom"
+const configname = "config.json"
 
 var hookfolder = "hooks/"
 
@@ -35,10 +36,6 @@ func main() {
 	flag.Parse()
 
 	hookfolder = filepath.Join(hookfolder, *hookProfile)
-
-	// TODO: read configJSON from file.
-	// config := map[string]interface{}{}
-	// json.Unmarshal([]byte(configJSON), &config)
 
 	if *createConfig {
 		createConfigFilesAndFolders()
@@ -62,7 +59,7 @@ func createConfigFilesAndFolders() {
 	}
 
 	// create configfile
-	configfile := filepath.Join(home, configfolder, "config.json")
+	configfile := filepath.Join(home, configfolder, configname)
 	_, err = os.Stat(configfile)
 	if errors.Is(err, os.ErrNotExist) {
 		f, _ := os.Create(configfile)
