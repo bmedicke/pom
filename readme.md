@@ -6,6 +6,7 @@ a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) time
 <!-- vim-markdown-toc GFM -->
 
 * [installation](#installation)
+* [usage](#usage)
 * [configuration](#configuration)
   * [hook profiles](#hook-profiles)
   * [show status in tmux](#show-status-in-tmux)
@@ -17,6 +18,32 @@ a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) time
 ```sh
 go install github.com/bmedicke/pom@latest
 ```
+
+## usage
+
+```sh
+pom
+```
+
+* **keyboard shortcuts** are loosely based on Vim
+  * `Esc` clear a chord
+  * `hjklgG` move around
+  * `cc` *continue* with next break/pomodoro
+  * `q` quit the program
+* *pom* logs all completed pomodoros to: `~/.pom/log.json`
+
+```json
+[
+  {
+    "CurrentTask": "research",
+    "PomDuration": 60000000000,
+    "StartTime": "2022-05-03T13:07:40.091129279+02:00",
+    "State": "work_done",
+    "StopTime": "2022-05-03T13:08:40.285970461+02:00"
+  },
+...
+```
+
 ## configuration
 
 * create the config folders and default hooks with the `--create-config` flag
