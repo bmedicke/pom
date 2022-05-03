@@ -85,7 +85,7 @@ func spawnTUI() {
 	)
 
 	updateBody(body)
-	go handlePomodoroState(&pom)
+	go handlePomodoroState(&pom, statusbar)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
 	app.SetRoot(frame, true)
@@ -120,7 +120,7 @@ func createPomodoro(
 	return pom
 }
 
-func handlePomodoroState(pom *Pomodoro) {
+func handlePomodoroState(pom *Pomodoro, view *tview.TextView) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
 	// TODO: listen to start/stop events from: main app & http API.
@@ -131,14 +131,14 @@ func handlePomodoroState(pom *Pomodoro) {
 		}
 		switch (*pom).State {
 		case "ready":
-			executeShellHook("work_start")
+			view.SetText(executeShellHook("work_start"))
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).PomDuration - delta
 			if remaining <= 0 {
-				executeShellHook("work_done")
+				view.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).Waiting = true
@@ -147,14 +147,14 @@ func handlePomodoroState(pom *Pomodoro) {
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			executeShellHook("break_start")
+			view.SetText(executeShellHook("break_start"))
 			(*pom).State = "break"
 			(*pom).BreakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).BreakStartTime)
 			remaining := (*pom).BreakDuration - delta
 			if remaining <= 0 {
-				executeShellHook("break_done")
+				view.SetText(executeShellHook("break_done"))
 				(*pom).State = "break_done"
 				(*pom).BreakStopTime = time.Now()
 				(*pom).DurationLeft = pomodoroDuration
@@ -251,8 +251,12 @@ func updateHeader(
 	}
 }
 
-func executeShellHook(script string) {
+func executeShellHook(script string) string {
 	home, _ := os.UserHomeDir()
 	hookpath := filepath.Join(home, configfolder, hookfolder, script)
-	exec.Command(hookpath).Output()
+	_, err := exec.Command(hookpath).Output()
+	if err != nil {
+		return fmt.Sprintf("hook error: [%s]", err)
+	}
+	return ""
 }
