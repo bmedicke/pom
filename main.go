@@ -12,8 +12,7 @@ import (
 
 //go:embed hooks/default.sh
 var defaultHookContent string
-
-const hookfolder string = ".pom/hooks"
+var hookfolder = ".pom/hooks/"
 
 func main() {
 	createConfig := flag.Bool(
@@ -21,11 +20,18 @@ func main() {
 		false,
 		"create .pom config folder with example hooks")
 
+	hookProfile := flag.String(
+		"profile",
+		"default",
+		"select hook profile from ~/.pom/hooks/",
+	)
+
 	flag.Parse()
 
 	if *createConfig {
 		createConfigFilesAndFolders()
 	} else {
+		hookfolder = filepath.Join(hookfolder, *hookProfile)
 		spawnTUI()
 	}
 }
