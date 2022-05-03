@@ -1,6 +1,6 @@
 # pom
 
-a command line pomodoro timer
+a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer
 
 
 <!-- vim-markdown-toc GFM -->
@@ -48,6 +48,7 @@ Here are a couple of example **usage scenarios** for hooks:
 ### show status in tmux
 
 * *pom* keeps a file at `~/.pom/tmux` that always shows the current status
+* when *pom* exits this file is emptied
 
 You can `cat` this into your tmux statusline:
 
