@@ -56,7 +56,7 @@ pom
   * `break_done`
 * the interpreter (`sh`, `zsh`, `python3`, etc.) of the script is set via the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
 
-Here are a couple of example **usage scenarios** for hooks:
+Here are a couple of **usage scenarios** for hooks:
 
   * start/stop your music (e.g. via `ncmpcpp`/`mpc`)
   * toggle a light (e.g. via Home Assistant's `hass`)
@@ -66,8 +66,8 @@ Here are a couple of example **usage scenarios** for hooks:
 ### hook profiles
 
 * the `default` hooks profile is used when no other is specified
-* you can create custom profiles
-* e.g. one that toggles a light when pomodoros/breaks end:
+* you can create custom hook profiles
+* e.g. a profile that toggles a light when pomodoros/breaks end:
   * create a folder `~/.pom/hooks/light`
   * add a `work_done` and a `break_done` script to it
   * add your shell commands to toggle the light
