@@ -131,14 +131,14 @@ func handlePomodoroState(pom *Pomodoro) {
 		}
 		switch (*pom).State {
 		case "ready":
-			executeShellHook("work_start.sh")
+			executeShellHook("work_start")
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).PomDuration - delta
 			if remaining <= 0 {
-				executeShellHook("work_done.sh")
+				executeShellHook("work_done")
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).Waiting = true
@@ -147,14 +147,14 @@ func handlePomodoroState(pom *Pomodoro) {
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			executeShellHook("break_start.sh")
+			executeShellHook("break_start")
 			(*pom).State = "break"
 			(*pom).BreakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).BreakStartTime)
 			remaining := (*pom).BreakDuration - delta
 			if remaining <= 0 {
-				executeShellHook("break_done.sh")
+				executeShellHook("break_done")
 				(*pom).State = "break_done"
 				(*pom).BreakStopTime = time.Now()
 				(*pom).DurationLeft = pomodoroDuration

@@ -66,10 +66,10 @@ func createConfigFilesAndFolders() {
 	}
 
 	defaultHooks := []string{
-		"work_start.sh",
-		"work_done.sh",
-		"break_start.sh",
-		"break_done.sh",
+		"work_start",
+		"work_done",
+		"break_start",
+		"break_done",
 	}
 
 	// create default hook scripts:
