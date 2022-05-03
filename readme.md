@@ -47,7 +47,7 @@ pom
 
 ## configuration
 
-* create the config folders and default hooks with the `--create-config` flag
+* **create the config folders and default hooks with the `--create-config` flag**
 * edit the scripts in `~/.pom/hooks/default`
 * the scripts are named after when they are called:
   * `work_start`
