@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -23,7 +25,7 @@ func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
 
 	for {
 		<-tick
-		if (*pom).Waiting {
+		if (*pom).waiting {
 			continue
 		}
 		switch (*pom).State {
@@ -38,32 +40,33 @@ func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
 				view.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
-				(*pom).Waiting = true
-				(*pom).DurationLeft = breakDuration
+				(*pom).waiting = true
+				(*pom).durationLeft = breakDuration
+				go logPomodoro(*pom)
 			} else {
-				(*pom).DurationLeft = remaining
+				(*pom).durationLeft = remaining
 			}
 		case "work_done":
 			view.SetText(executeShellHook("break_start"))
 			(*pom).State = "break"
-			(*pom).BreakStartTime = time.Now()
+			(*pom).breakStartTime = time.Now()
 		case "break":
-			delta := time.Now().Sub((*pom).BreakStartTime)
-			remaining := (*pom).BreakDuration - delta
+			delta := time.Now().Sub((*pom).breakStartTime)
+			remaining := (*pom).breakDuration - delta
 			if remaining <= 0 {
 				view.SetText(executeShellHook("break_done"))
 				(*pom).State = "break_done"
-				(*pom).BreakStopTime = time.Now()
-				(*pom).DurationLeft = pomodoroDuration
-				(*pom).Waiting = true
+				(*pom).breakStopTime = time.Now()
+				(*pom).durationLeft = pomodoroDuration
+				(*pom).waiting = true
 			} else {
-				(*pom).DurationLeft = remaining
+				(*pom).durationLeft = remaining
 			}
 		case "break_done":
 			(*pom).State = "ready"
 			(*pom).PomDuration = pomodoroDuration
-			(*pom).DurationLeft = pomodoroDuration
-			(*pom).BreakDuration = breakDuration
+			(*pom).durationLeft = pomodoroDuration
+			(*pom).breakDuration = breakDuration
 		}
 	}
 }
@@ -85,7 +88,7 @@ func writeTmuxFile(pom *pomodoro) {
 			fmt.Sprintf(
 				"%s %s",
 				(*pom).State,
-				(*pom).DurationLeft.Round(time.Second),
+				(*pom).durationLeft.Round(time.Second),
 			),
 		)
 	}
@@ -109,4 +112,19 @@ func executeShellHook(script string) string {
 		return fmt.Sprintf("hook error: [%s]", err)
 	}
 	return ""
+}
+
+func logPomodoro(newPomodoro pomodoro) {
+	home, _ := os.UserHomeDir()
+	log := filepath.Join(home, configfolder, "log.json")
+	var pomodoros []pomodoro
+
+	file, _ := os.Open(log)
+	content, _ := ioutil.ReadAll(file)
+	json.Unmarshal(content, &pomodoros)
+
+	pomodoros = append(pomodoros, newPomodoro)
+	newJSON, _ := json.MarshalIndent(pomodoros, "", "  ")
+	file, _ = os.OpenFile(log, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	file.WriteString(string(newJSON))
 }

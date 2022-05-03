@@ -92,16 +92,16 @@ func spawnTUI() {
 }
 
 type pomodoro struct {
-	State          string
-	StartTime      time.Time
-	StopTime       time.Time
-	PomDuration    time.Duration
-	DurationLeft   time.Duration
-	BreakStartTime time.Time
-	BreakStopTime  time.Time
-	BreakDuration  time.Duration
-	Waiting        bool
 	CurrentTask    string
+	PomDuration    time.Duration
+	StartTime      time.Time
+	State          string
+	StopTime       time.Time
+	breakDuration  time.Duration
+	breakStartTime time.Time
+	breakStopTime  time.Time
+	durationLeft   time.Duration
+	waiting        bool
 }
 
 func createPomodoro(
@@ -111,9 +111,9 @@ func createPomodoro(
 	pom := pomodoro{
 		State:         "ready",
 		PomDuration:   duration,
-		DurationLeft:  duration,
-		BreakDuration: breakDuration,
-		Waiting:       true,
+		durationLeft:  duration,
+		breakDuration: breakDuration,
+		waiting:       true,
 	}
 	return pom
 }
@@ -159,7 +159,7 @@ func handleAction(action string, pom *pomodoro) {
 	switch action {
 	case "continue":
 		// TODO send signal instead of mutating state directly! (commandChannel)
-		(*pom).Waiting = false // TODO READ ONLY!
+		(*pom).waiting = false // TODO READ ONLY!
 	case "create_pomodoro":
 	case "create_break":
 	case "cancel":
@@ -175,11 +175,11 @@ func updateHeader(
 	pom *pomodoro,
 ) {
 	tick := make(chan time.Time)
-	go attachTicker(tick, time.Millisecond * 200)
+	go attachTicker(tick, time.Millisecond*200)
 
 	for {
 		<-tick
-		timeleft := (*pom).DurationLeft.Round(time.Second)
+		timeleft := (*pom).durationLeft.Round(time.Second)
 		// TODO left pad text:
 		right.SetText(fmt.Sprintf("%v [%v]", (*pom).State, timeleft))
 
