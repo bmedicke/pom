@@ -10,16 +10,16 @@ import (
 	"path/filepath"
 )
 
-//go:embed callbacks/default.sh
-var defaultCallbackContent string
+//go:embed hooks/default.sh
+var defaultHookContent string
 
-const callbackfolder string = ".pom/callbacks"
+const hookfolder string = ".pom/hooks"
 
 func main() {
 	createConfig := flag.Bool(
 		"create-config",
 		false,
-		"create .pom config folder with example callbacks")
+		"create .pom config folder with example hooks")
 
 	flag.Parse()
 
@@ -36,25 +36,25 @@ func createConfigFilesAndFolders() {
 		log.Panic(err)
 	}
 
-	callbackpath := filepath.Join(home, callbackfolder)
-	err = os.MkdirAll(callbackpath, 0700)
+	hookpath := filepath.Join(home, hookfolder)
+	err = os.MkdirAll(hookpath, 0700)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	defaultCallbacks := []string{
+	defaultHooks := []string{
 		"work_start.sh",
 		"work_done.sh",
 		"break_start.sh",
 		"break_done.sh",
 	}
 
-	for _, callback := range defaultCallbacks {
-		file := filepath.Join(callbackpath, callback)
+	for _, hook := range defaultHooks {
+		file := filepath.Join(hookpath, hook)
 		_, err := os.Stat(file)
 		if errors.Is(err, os.ErrNotExist) {
 			f, _ := os.Create(file)
-			f.WriteString(defaultCallbackContent)
+			f.WriteString(defaultHookContent)
 			os.Chmod(file, 0700) // make it executable.
 			defer f.Close()
 		}

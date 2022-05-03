@@ -131,14 +131,14 @@ func handlePomodoroState(pom *Pomodoro) {
 		}
 		switch (*pom).State {
 		case "ready":
-			executeShellCallback("work_start.sh")
+			executeShellHook("work_start.sh")
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).PomDuration - delta
 			if remaining <= 0 {
-				executeShellCallback("work_done.sh")
+				executeShellHook("work_done.sh")
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).Waiting = true
@@ -147,14 +147,14 @@ func handlePomodoroState(pom *Pomodoro) {
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			executeShellCallback("break_start.sh")
+			executeShellHook("break_start.sh")
 			(*pom).State = "break"
 			(*pom).BreakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).BreakStartTime)
 			remaining := (*pom).BreakDuration - delta
 			if remaining <= 0 {
-				executeShellCallback("break_done.sh")
+				executeShellHook("break_done.sh")
 				(*pom).State = "break_done"
 				(*pom).BreakStopTime = time.Now()
 				(*pom).DurationLeft = pomodoroDuration
@@ -251,8 +251,8 @@ func updateHeader(
 	}
 }
 
-func executeShellCallback(script string) {
+func executeShellHook(script string) {
 	home, _ := os.UserHomeDir()
-	callbackpath := filepath.Join(home, callbackfolder, script)
-	exec.Command(callbackpath).Output()
+	hookpath := filepath.Join(home, hookfolder, script)
+	exec.Command(hookpath).Output()
 }
