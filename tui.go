@@ -62,7 +62,7 @@ func spawnTUI() {
 
 	body.SetSelectable(true, true)
 
-	app.SetInputCapture(
+	body.SetInputCapture(
 		func(event *tcell.EventKey) *tcell.EventKey {
 			if event.Key() == tcell.KeyEsc {
 				util.ResetChord(&chord)
