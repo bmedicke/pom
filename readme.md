@@ -2,6 +2,15 @@
 
 a command line pomodoro timer
 
+
+<!-- vim-markdown-toc GFM -->
+
+* [installation](#installation)
+* [configuration](#configuration)
+  * [hook profiles](#hook-profiles)
+
+<!-- vim-markdown-toc -->
+
 ## installation
 
 ```sh
