@@ -27,9 +27,11 @@ go install github.com/bmedicke/bhdr@latest
   * `break_done.sh`
 
 Here are a couple of example **usage scenarios** for hooks:
+
   * start/stop your music (e.g. via `ncmpcpp`/`mpc`)
   * toggle a light (e.g. via Home Assistant's `hass`)
   * send a notification (via `prowl`'s REST API, etc.)
+  * set a Home Assistant `input_boolean` for further scripting
 
 ### hook profiles
 
