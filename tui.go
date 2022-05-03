@@ -124,8 +124,11 @@ func handlePomodoroState(pom *Pomodoro, view *tview.TextView) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
 	// TODO: listen to start/stop events from: main app & http API.
-	// TODO: use attachTicker() to reduce CPU load:
+	tick := make(chan time.Time)
+	go attachTicker(tick)
+
 	for {
+		<-tick
 		if (*pom).Waiting {
 			continue
 		}
@@ -201,7 +204,7 @@ func updateBody(view *tview.Table) {
 
 func attachTicker(timer chan time.Time) {
 	timer <- time.Now() // send one tick immediately.
-	t := time.NewTicker(500 * time.Millisecond)
+	t := time.NewTicker(20 * time.Millisecond)
 	for c := range t.C {
 		timer <- c
 	}
@@ -211,7 +214,7 @@ func handleAction(action string, pom *Pomodoro) {
 	switch action {
 	case "continue":
 		// TODO send signal instead of mutating state directly! (commandChannel)
-		(*pom).Waiting = false
+		(*pom).Waiting = false // TODO READ ONLY!
 	case "create_pomodoro":
 	case "create_break":
 	case "cancel":
@@ -226,11 +229,11 @@ func updateHeader(
 	right *tview.TextView,
 	pom *Pomodoro,
 ) {
-	ticker := make(chan time.Time)
-	go attachTicker(ticker)
+	tick := make(chan time.Time)
+	go attachTicker(tick)
 
 	for {
-		<-ticker
+		<-tick
 		timeleft := (*pom).DurationLeft.Round(time.Second)
 		// TODO left pad text:
 		right.SetText(fmt.Sprintf("%v [%v]", (*pom).State, timeleft))
