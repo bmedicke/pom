@@ -44,6 +44,17 @@ func spawnTUI() {
 	breakDuration = time.Duration(
 		config.BreakDurationMinutes,
 	) * time.Minute
+
+	// set sensible default durations
+	// (in case of missing config file):
+	if pomodoroDuration == 0 {
+		pomodoroDuration = 25 * time.Minute
+	}
+
+	if breakDuration == 0 {
+		breakDuration = 5 * time.Minute
+	}
+
 	pom := createPomodoro(pomodoroDuration, breakDuration)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
