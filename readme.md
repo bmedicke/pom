@@ -26,9 +26,14 @@ go install github.com/bmedicke/bhdr@latest
   * `break_start.sh`
   * `break_done.sh`
 
+Here are a couple of example **usage scenarios** for hooks:
+  * start/stop your music (e.g. via `ncmpcpp`/`mpc`)
+  * toggle a light (e.g. via Home Assistant's `hass`)
+  * send a notification (via `prowl`'s REST API, etc.)
+
 ### hook profiles
 
-* the default hooks profile is used when no other is specified
+* the `default` hooks profile is used when no other is specified
 * you can create custom profiles
 * e.g. one that toggles a light when pomodoros/breaks end:
   * create a folder `~/.pom/hooks/light`
