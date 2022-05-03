@@ -23,6 +23,7 @@ const (
 )
 
 func spawnTUI() {
+	// TODO: create commandChannel for handlePomodoroState().
 	app := tview.NewApplication()
 	pom := createPomodoro(pomodoroDuration, breakDuration)
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
@@ -74,10 +75,8 @@ func spawnTUI() {
 				switch event.Rune() {
 				case 'q':
 					app.Stop()
-				case 'c', 'd':
-					if err := util.HandleChords(event.Rune(), &chord, chordmap); err != nil {
-						statusbar.SetText(fmt.Sprint(err))
-					}
+				case 'c', 'd': // start chord:
+					util.HandleChords(event.Rune(), &chord, chordmap)
 				}
 			}
 			statusbar.SetText(chord.Buffer)
@@ -122,10 +121,10 @@ func createPomodoro(
 }
 
 func handlePomodoroState(pom *Pomodoro) {
-	// this is the only place where the pomodoro should be changed!
-	// create commandChannel:
-	// listen to start/stop events from:
-	// main app & http API
+	// this is the only place where the pomodoro should be changed,
+	// all external changes should be triggered via channels!
+	// TODO: listen to start/stop events from: main app & http API.
+	// TODO: use attachTicker() to reduce CPU load:
 	for {
 		if (*pom).Waiting {
 			continue
@@ -173,7 +172,7 @@ func handlePomodoroState(pom *Pomodoro) {
 }
 
 func updateBody(view *tview.Table) {
-	// read (only!) from struct?
+	// TODO: read-only from struct, update via commandChannel (task).
 	b := []map[string]string{
 		{"id": "current task", "value": "research"},
 		{"id": "server", "value": "0.0.0.0:8421/api"},
@@ -211,7 +210,7 @@ func attachTicker(timer chan time.Time) {
 func handleAction(action string, pom *Pomodoro) {
 	switch action {
 	case "continue":
-		// TODO send signal instead of mutating state directly!
+		// TODO send signal instead of mutating state directly! (commandChannel)
 		(*pom).Waiting = false
 	case "create_pomodoro":
 	case "create_break":
