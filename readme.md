@@ -14,7 +14,7 @@ a command line pomodoro timer
 ## installation
 
 ```sh
-go install github.com/bmedicke/bhdr@latest
+go install github.com/bmedicke/pom@latest
 ```
 ## configuration
 
