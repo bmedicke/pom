@@ -19,13 +19,13 @@ go install github.com/bmedicke/pom@latest
 ## configuration
 
 * create the config folders and default hooks with the `--create-config` flag
-* edit the shell scripts in `~/.pom/hooks/default`
+* edit the scripts in `~/.pom/hooks/default`
 * the scripts are named after when they are called:
   * `work_start`
   * `work_done`
   * `break_start`
   * `break_done`
-* the interpreter of the script is set via the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
+* the interpreter (`sh`, `zsh`, `python3`, etc.) of the script is set via the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
 
 Here are a couple of example **usage scenarios** for hooks:
 
