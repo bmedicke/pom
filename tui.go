@@ -104,7 +104,7 @@ func spawnTUI() {
 
 			if chord.Active {
 				util.HandleChords(event.Rune(), &chord, chordmap)
-				handleAction(chord.Action, &pom)
+				handleAction(chord.Action, pom, command)
 			} else {
 				switch event.Rune() {
 				case 'q':
@@ -178,11 +178,10 @@ func attachTicker(timer chan time.Time, interval time.Duration) {
 	}
 }
 
-func handleAction(action string, pom *pomodoro) {
+func handleAction(action string, pom pomodoro, command chan pomodoroCommand) {
 	switch action {
 	case "continue":
-		// TODO send signal instead of mutating state directly! (commandChannel)
-		(*pom).waiting = false // TODO READ ONLY!
+		command <- pomodoroCommand{commandtype: "continue"}
 	case "create_pomodoro":
 	case "create_break":
 	case "cancel":

@@ -52,6 +52,8 @@ func handlePomodoroState(
 		select {
 		case cmd := <-command:
 			switch cmd.commandtype {
+			case "continue":
+				(*pom).waiting = false
 			case "update_note":
 				(*pom).Note = cmd.payload
 			case "update_task":
