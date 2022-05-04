@@ -126,38 +126,17 @@ func spawnTUI() {
 	app.SetFocus(bodytable).Run()
 }
 
-type pomodoro struct {
-	CurrentTask    string
-	PomDuration    time.Duration
-	StartTime      time.Time
-	State          string
-	StopTime       time.Time
-	breakDuration  time.Duration
-	breakStartTime time.Time
-	breakStopTime  time.Time
-	durationLeft   time.Duration
-	waiting        bool
-}
-
-func createPomodoro(
-	duration time.Duration,
-	breakDuration time.Duration,
-) pomodoro {
-	pom := pomodoro{
-		State:         "ready",
-		PomDuration:   duration,
-		durationLeft:  duration,
-		breakDuration: breakDuration,
-		waiting:       true,
-	}
-	return pom
-}
-
 func createBodytable(view *tview.Table) {
 	b := []map[string]string{
 		{
 			"id":       "current task",
 			"onchange": "update_task",
+			"type":     "editable",
+			"value":    "",
+		},
+		{
+			"id":       "note",
+			"onchange": "update_note",
 			"type":     "editable",
 			"value":    "",
 		},

@@ -36,8 +36,8 @@ pom
 ```json
 [
   {
-    "CurrentTask": "research",
-    "PomDuration": 60000000000,
+    "Task": "research",
+    "Duration": 60000000000,
     "StartTime": "2022-05-03T13:07:40.091129279+02:00",
     "State": "work_done",
     "StopTime": "2022-05-03T13:08:40.285970461+02:00"

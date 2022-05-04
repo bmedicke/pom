@@ -13,7 +13,20 @@ import (
 	"github.com/rivo/tview"
 )
 
-// PomodoroCommand is used to communicate with the state machine:
+type pomodoro struct {
+	Task           string
+	Note           string
+	Duration       time.Duration
+	StartTime      time.Time
+	State          string
+	StopTime       time.Time
+	breakDuration  time.Duration
+	breakStartTime time.Time
+	breakStopTime  time.Time
+	durationLeft   time.Duration
+	waiting        bool
+}
+
 type pomodoroCommand struct {
 	commandtype string
 	payload     string
@@ -39,8 +52,10 @@ func handlePomodoroState(
 		select {
 		case cmd := <-command:
 			switch cmd.commandtype {
+			case "update_note":
+				(*pom).Note = cmd.payload
 			case "update_task":
-				(*pom).CurrentTask = cmd.payload
+				(*pom).Task = cmd.payload
 			}
 		default:
 		}
@@ -55,7 +70,7 @@ func handlePomodoroState(
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
-			remaining := (*pom).PomDuration - delta
+			remaining := (*pom).Duration - delta
 			if remaining <= 0 {
 				view.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
@@ -84,7 +99,7 @@ func handlePomodoroState(
 			}
 		case "break_done":
 			(*pom).State = "ready"
-			(*pom).PomDuration = pomodoroDuration
+			(*pom).Duration = pomodoroDuration
 			(*pom).durationLeft = pomodoroDuration
 			(*pom).breakDuration = breakDuration
 		}
@@ -147,4 +162,18 @@ func logPomodoro(newPomodoro pomodoro) {
 	newJSON, _ := json.MarshalIndent(pomodoros, "", "  ")
 	file, _ = os.OpenFile(log, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	file.WriteString(string(newJSON))
+}
+
+func createPomodoro(
+	duration time.Duration,
+	breakDuration time.Duration,
+) pomodoro {
+	pom := pomodoro{
+		State:         "ready",
+		Duration:      duration,
+		durationLeft:  duration,
+		breakDuration: breakDuration,
+		waiting:       true,
+	}
+	return pom
 }
