@@ -36,6 +36,7 @@ func handlePomodoroState(
 	pom *pomodoro,
 	view *tview.TextView,
 	command chan pomodoroCommand,
+	config Config,
 ) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
@@ -78,7 +79,7 @@ func handlePomodoroState(
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
-				(*pom).durationLeft = breakDuration
+				(*pom).durationLeft = (*pom).breakDuration
 				go logPomodoro(*pom)
 			} else {
 				(*pom).durationLeft = remaining
@@ -94,16 +95,14 @@ func handlePomodoroState(
 				view.SetText(executeShellHook("break_done"))
 				(*pom).State = "break_done"
 				(*pom).breakStopTime = time.Now()
-				(*pom).durationLeft = pomodoroDuration
+				(*pom).durationLeft = (*pom).Duration
 				(*pom).waiting = true
 			} else {
 				(*pom).durationLeft = remaining
 			}
 		case "break_done":
 			(*pom).State = "ready"
-			(*pom).Duration = pomodoroDuration
-			(*pom).durationLeft = pomodoroDuration
-			(*pom).breakDuration = breakDuration
+			(*pom).durationLeft = (*pom).Duration
 		}
 	}
 }
@@ -166,15 +165,30 @@ func logPomodoro(newPomodoro pomodoro) {
 	file.WriteString(string(newJSON))
 }
 
-func createPomodoro(
-	duration time.Duration,
-	breakDuration time.Duration,
-) pomodoro {
+func createPomodoro(config Config) pomodoro {
+	pomodoroDuration := time.Duration(
+		config.PomodoroDurationMinutes,
+	) * time.Minute
+	breakDuration := time.Duration(
+		config.BreakDurationMinutes,
+	) * time.Minute
+
+	// set sensible default durations
+	// (in case of missing config file):
+	if pomodoroDuration == 0 {
+		pomodoroDuration = 25 * time.Minute
+	}
+	if breakDuration == 0 {
+		breakDuration = 5 * time.Minute
+	}
+
 	pom := pomodoro{
 		State:         "ready",
-		Duration:      duration,
-		durationLeft:  duration,
+		Task:          config.DefaultNote,
+		Note:          config.DefaultTask,
+		Duration:      pomodoroDuration,
 		breakDuration: breakDuration,
+		durationLeft:  pomodoroDuration,
 		waiting:       true,
 	}
 	return pom

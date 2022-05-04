@@ -17,15 +17,12 @@ import (
 //go:embed chordmap.json
 var chordmapJSON string
 
-var (
-	pomodoroDuration time.Duration
-	breakDuration    time.Duration
-)
-
 // Config is used for unmarshalling.
 type Config struct {
-	PomodoroDurationMinutes int `json:"pomodoroDurationMinutes"`
-	BreakDurationMinutes    int `json:"breakDurationMinutes"`
+	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
+	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
+	DefaultNote             string `json:"defaultNote"`
+	DefaultTask             string `json:"defaultTask"`
 }
 
 func spawnTUI() {
@@ -39,25 +36,8 @@ func spawnTUI() {
 	chordmap := map[string]interface{}{}
 	json.Unmarshal([]byte(chordmapJSON), &chordmap)
 
-	// parse config file:
 	config := getConfig()
-	pomodoroDuration = time.Duration(
-		config.PomodoroDurationMinutes,
-	) * time.Minute
-	breakDuration = time.Duration(
-		config.BreakDurationMinutes,
-	) * time.Minute
-
-	// set sensible default durations
-	// (in case of missing config file):
-	if pomodoroDuration == 0 {
-		pomodoroDuration = 25 * time.Minute
-	}
-	if breakDuration == 0 {
-		breakDuration = 5 * time.Minute
-	}
-
-	pom := createPomodoro(pomodoroDuration, breakDuration)
+	pom := createPomodoro(config)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	frame := tview.NewFrame(layout)
@@ -118,27 +98,27 @@ func spawnTUI() {
 		},
 	)
 
-	createBodytable(bodytable)
-	go handlePomodoroState(&pom, statusbar, command)
+	createBodytable(bodytable, config)
+	go handlePomodoroState(&pom, statusbar, command, config)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
 	app.SetRoot(frame, true)
 	app.SetFocus(bodytable).Run()
 }
 
-func createBodytable(view *tview.Table) {
+func createBodytable(view *tview.Table, config Config) {
 	b := []map[string]string{
 		{
 			"id":       "current task",
 			"onchange": "update_task",
 			"type":     "editable",
-			"value":    "",
+			"value":    config.DefaultTask,
 		},
 		{
 			"id":       "note",
 			"onchange": "update_note",
 			"type":     "editable",
-			"value":    "",
+			"value":    config.DefaultNote,
 		},
 		{"id": "server", "value": "0.0.0.0:8421/api"},
 	}

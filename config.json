@@ -1,4 +1,6 @@
 {
-  "pomodoroDurationMinutes": 25,
-  "breakDurationMinutes": 5
+  "defaultNote": "",
+  "defaultTask": "",
+  "breakDurationMinutes": 5,
+  "pomodoroDurationMinutes": 25
 }
