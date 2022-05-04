@@ -63,7 +63,8 @@ func spawnTUI() {
 	headerleft := tview.NewTextView()
 	headercenter := tview.NewTextView()
 	headerright := tview.NewTextView()
-	body := tview.NewTable()
+	body := tview.NewPages()
+	bodytable := tview.NewTable()
 	statusbar := tview.NewTextView()
 
 	frame.AddText(" P 🐕 M ", true, tview.AlignCenter, tcell.ColorLime)
@@ -86,13 +87,17 @@ func spawnTUI() {
 	statusbar.SetBorderPadding(0, 0, 0, 0)
 	statusbar.SetChangedFunc(func() { app.Draw() })
 
-	body.SetSelectable(true, true)
+	body.AddPage("table", bodytable, true, true)
 
-	body.SetInputCapture(
+	bodytable.SetSelectable(true, true)
+
+	bodytable.SetInputCapture(
 		func(event *tcell.EventKey) *tcell.EventKey {
 			switch event.Key() {
 			case tcell.KeyEsc:
 				util.ResetChord(&chord)
+			case tcell.KeyEnter:
+				editTableCell(body, bodytable)
 			}
 
 			if chord.Active {
@@ -111,12 +116,12 @@ func spawnTUI() {
 		},
 	)
 
-	updateBody(body)
+	prefillBodytable(bodytable)
 	go handlePomodoroState(&pom, statusbar)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
 	app.SetRoot(frame, true)
-	app.SetFocus(body).Run()
+	app.SetFocus(bodytable).Run()
 }
 
 type pomodoro struct {
@@ -146,10 +151,9 @@ func createPomodoro(
 	return pom
 }
 
-func updateBody(view *tview.Table) {
-	// TODO: read-only from struct, update via commandChannel (task).
+func prefillBodytable(view *tview.Table) {
 	b := []map[string]string{
-		{"id": "current task", "value": "research"},
+		{"id": "current task", "value": "research", "type": "editable"},
 		{"id": "server", "value": "0.0.0.0:8421/api"},
 	}
 	cols, rows := 3, len(b)
@@ -166,7 +170,9 @@ func updateBody(view *tview.Table) {
 				s = b[row]["value"]
 			}
 			cell := tview.NewTableCell(s)
-			if col < 2 {
+			if b[row]["type"] == "editable" && col == 2 {
+				cell.SetSelectable(true)
+			} else {
 				cell.SetSelectable(false)
 			}
 			view.SetCell(row, col, cell)
@@ -237,4 +243,21 @@ func getConfig() Config {
 	json.Unmarshal([]byte(configJSON), &config)
 
 	return config
+}
+
+func editTableCell(pages *tview.Pages, table *tview.Table) {
+	cell := table.GetCell(table.GetSelection())
+	x, y, w := cell.GetLastPosition()
+	inputField := tview.NewInputField()
+
+	inputField.SetRect(x, y, w, 1)
+	inputField.SetText(cell.Text)
+	inputField.SetDoneFunc(
+		func(key tcell.Key) {
+			cell.SetText(inputField.GetText())
+			pages.RemovePage("edit")
+		},
+	)
+
+	pages.AddPage("edit", inputField, false, true)
 }
