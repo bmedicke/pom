@@ -29,17 +29,22 @@ pom
 * **keyboard shortcuts** are loosely based on Vim
   * `Esc` clear a chord
   * `hjklgG` move around
-  * `cc` *continue* with next break/pomodoro
-  * `q` quit the program
+  * `a`/`A`/`Enter` append to cell
+  * `cc` change cell
+  * `dd`/`dc` delete cell content
+  * `;` next break/pomodoro
+  * `q`/`Q` quit the program
 * *pom* logs all completed pomodoros to: `~/.pom/log.json`
 
 ```json
 [
   {
+    "Project": "master thesis",
     "Task": "research",
+    "Note": "mode locking",
     "Duration": 60000000000,
-    "StartTime": "2022-05-03T13:07:40.091129279+02:00",
     "State": "work_done",
+    "StartTime": "2022-05-03T13:07:40.091129279+02:00",
     "StopTime": "2022-05-03T13:08:40.285970461+02:00"
   },
 ...

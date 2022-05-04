@@ -14,6 +14,7 @@ import (
 )
 
 type pomodoro struct {
+	Project        string
 	Task           string
 	Note           string
 	Duration       time.Duration
@@ -55,10 +56,12 @@ func handlePomodoroState(
 			switch cmd.commandtype {
 			case "continue":
 				(*pom).waiting = false
-			case "update_note":
-				(*pom).Note = cmd.payload
+			case "update_project":
+				(*pom).Project = cmd.payload
 			case "update_task":
 				(*pom).Task = cmd.payload
+			case "update_note":
+				(*pom).Note = cmd.payload
 			}
 		default:
 		}
@@ -184,6 +187,7 @@ func createPomodoro(config Config) pomodoro {
 
 	pom := pomodoro{
 		State:         "ready",
+		Project:       config.DefaultProject,
 		Task:          config.DefaultNote,
 		Note:          config.DefaultTask,
 		Duration:      pomodoroDuration,

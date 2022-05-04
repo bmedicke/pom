@@ -19,10 +19,11 @@ var chordmapJSON string
 
 // Config is used for unmarshalling.
 type Config struct {
+	DefaultProject          string `json:"defaultProject"`
+	DefaultTask             string `json:"defaultTask"`
+	DefaultNote             string `json:"defaultNote"`
 	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
 	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
-	DefaultNote             string `json:"defaultNote"`
-	DefaultTask             string `json:"defaultTask"`
 }
 
 func spawnTUI() {
@@ -78,15 +79,19 @@ func spawnTUI() {
 			case tcell.KeyEsc:
 				util.ResetChord(&chord)
 			case tcell.KeyEnter:
-				editTableCell(body, bodytable, command)
+				editTableCell(body, bodytable, command, "append_cell")
 			}
 
 			if chord.Active {
 				util.HandleChords(event.Rune(), &chord, chordmap)
-				handleAction(chord.Action, command)
+				handleAction(chord.Action, command, body, bodytable)
 			} else {
 				switch event.Rune() {
-				case 'q':
+				case 'a', 'A':
+					editTableCell(body, bodytable, command, "append_cell")
+				case ';':
+					command <- pomodoroCommand{commandtype: "continue"}
+				case 'q', 'Q':
 					app.Stop()
 				case 'c', 'd': // start chord:
 					util.HandleChords(event.Rune(), &chord, chordmap)
@@ -108,7 +113,13 @@ func spawnTUI() {
 func createBodytable(view *tview.Table, config Config) {
 	b := []map[string]string{
 		{
-			"id":       "current task",
+			"id":       "projekt",
+			"onchange": "update_project",
+			"type":     "editable",
+			"value":    config.DefaultProject,
+		},
+		{
+			"id":       "task",
 			"onchange": "update_task",
 			"type":     "editable",
 			"value":    config.DefaultTask,
@@ -157,15 +168,15 @@ func attachTicker(timer chan time.Time, interval time.Duration) {
 	}
 }
 
-func handleAction(action string, command chan pomodoroCommand) {
+func handleAction(
+	action string,
+	command chan pomodoroCommand,
+	body *tview.Pages,
+	bodytable *tview.Table,
+) {
 	switch action {
-	case "continue":
-		command <- pomodoroCommand{commandtype: "continue"}
-	case "create_pomodoro":
-	case "create_break":
-	case "cancel":
-	case "delete_pomodoro":
-	case "delete_break":
+	case "change_cell", "delete_cell":
+		editTableCell(body, bodytable, command, action)
 	}
 }
 
@@ -216,22 +227,34 @@ func editTableCell(
 	pages *tview.Pages,
 	table *tview.Table,
 	command chan pomodoroCommand,
+	action string,
 ) {
 	cell := table.GetCell(table.GetSelection())
 	x, y, w := cell.GetLastPosition()
 	inputField := tview.NewInputField()
-
 	inputField.SetRect(x, y, w, 1)
-	inputField.SetText(cell.Text)
+
+	switch action {
+	case "append_cell":
+		inputField.SetText(cell.Text)
+	case "change_cell":
+		inputField.SetText("")
+	case "delete_cell":
+		cell.SetText("")
+		command <- pomodoroCommand{
+			commandtype: cell.GetReference().(string), payload: "",
+		}
+		return
+	}
+
 	inputField.SetDoneFunc(
 		func(key tcell.Key) {
 			cell.SetText(inputField.GetText())
-			// update pomodoro:
+			pages.RemovePage("edit")
 			command <- pomodoroCommand{
 				commandtype: cell.GetReference().(string),
 				payload:     inputField.GetText(),
 			}
-			pages.RemovePage("edit")
 		},
 	)
 

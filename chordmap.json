@@ -1,12 +1,9 @@
 {
   "c": {
-    "c": "continue",
-    "p": "create_pomodoro",
-    "b": "create_break"
+    "c": "change_cell"
   },
   "d": {
-    "d": "cancel",
-    "p": "delete_pomodoro",
-    "b": "delete_pomodoro"
+    "d": "delete_cell",
+    "c": "delete_cell"
   }
 }
