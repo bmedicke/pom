@@ -29,10 +29,13 @@ type Config struct {
 }
 
 func spawnTUI() {
-	// TODO: create commandChannel for handlePomodoroState().
 	app := tview.NewApplication()
-	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 
+	// used for updating the pomodoro from goroutines:
+	command := make(chan pomodoroCommand)
+
+	// vim-style key chords:
+	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 	chordmap := map[string]interface{}{}
 	json.Unmarshal([]byte(chordmapJSON), &chordmap)
 
@@ -50,7 +53,6 @@ func spawnTUI() {
 	if pomodoroDuration == 0 {
 		pomodoroDuration = 25 * time.Minute
 	}
-
 	if breakDuration == 0 {
 		breakDuration = 5 * time.Minute
 	}
@@ -87,17 +89,17 @@ func spawnTUI() {
 	statusbar.SetBorderPadding(0, 0, 0, 0)
 	statusbar.SetChangedFunc(func() { app.Draw() })
 
+	// page used for overlaying widgets (edit box):
 	body.AddPage("table", bodytable, true, true)
 
 	bodytable.SetSelectable(true, true)
-
 	bodytable.SetInputCapture(
 		func(event *tcell.EventKey) *tcell.EventKey {
 			switch event.Key() {
 			case tcell.KeyEsc:
 				util.ResetChord(&chord)
 			case tcell.KeyEnter:
-				editTableCell(body, bodytable)
+				editTableCell(body, bodytable, command)
 			}
 
 			if chord.Active {
@@ -116,8 +118,8 @@ func spawnTUI() {
 		},
 	)
 
-	prefillBodytable(bodytable)
-	go handlePomodoroState(&pom, statusbar)
+	createBodytable(bodytable)
+	go handlePomodoroState(&pom, statusbar, command)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
 	app.SetRoot(frame, true)
@@ -151,9 +153,14 @@ func createPomodoro(
 	return pom
 }
 
-func prefillBodytable(view *tview.Table) {
+func createBodytable(view *tview.Table) {
 	b := []map[string]string{
-		{"id": "current task", "value": "research", "type": "editable"},
+		{
+			"id":       "current task",
+			"onchange": "update_task",
+			"type":     "editable",
+			"value":    "",
+		},
 		{"id": "server", "value": "0.0.0.0:8421/api"},
 	}
 	cols, rows := 3, len(b)
@@ -172,6 +179,9 @@ func prefillBodytable(view *tview.Table) {
 			cell := tview.NewTableCell(s)
 			if b[row]["type"] == "editable" && col == 2 {
 				cell.SetSelectable(true)
+				// the ref stores the PomodoroCommand type for sending
+				// updates via the command channel:
+				cell.SetReference(b[row]["onchange"])
 			} else {
 				cell.SetSelectable(false)
 			}
@@ -245,7 +255,11 @@ func getConfig() Config {
 	return config
 }
 
-func editTableCell(pages *tview.Pages, table *tview.Table) {
+func editTableCell(
+	pages *tview.Pages,
+	table *tview.Table,
+	command chan pomodoroCommand,
+) {
 	cell := table.GetCell(table.GetSelection())
 	x, y, w := cell.GetLastPosition()
 	inputField := tview.NewInputField()
@@ -255,6 +269,11 @@ func editTableCell(pages *tview.Pages, table *tview.Table) {
 	inputField.SetDoneFunc(
 		func(key tcell.Key) {
 			cell.SetText(inputField.GetText())
+			// update pomodoro:
+			command <- pomodoroCommand{
+				commandtype: cell.GetReference().(string),
+				payload:     inputField.GetText(),
+			}
 			pages.RemovePage("edit")
 		},
 	)

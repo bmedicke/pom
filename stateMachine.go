@@ -13,18 +13,38 @@ import (
 	"github.com/rivo/tview"
 )
 
-func handlePomodoroState(pom *pomodoro, view *tview.TextView) {
+// PomodoroCommand is used to communicate with the state machine:
+type pomodoroCommand struct {
+	commandtype string
+	payload     string
+}
+
+func handlePomodoroState(
+	pom *pomodoro,
+	view *tview.TextView,
+	command chan pomodoroCommand,
+) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
 	// TODO: use channel for changing the statusbar.
 	// TODO: listen to start/stop events from: main app & http API.
-	// TODO: listen for change-current-focus event.
 	tick := make(chan time.Time)
 	go attachTicker(tick, time.Millisecond*200)
 	go writeTmuxFile(pom)
 
 	for {
 		<-tick
+
+		// non-blocking command handling:
+		select {
+		case cmd := <-command:
+			switch cmd.commandtype {
+			case "update_task":
+				(*pom).CurrentTask = cmd.payload
+			}
+		default:
+		}
+
 		if (*pom).waiting {
 			continue
 		}
