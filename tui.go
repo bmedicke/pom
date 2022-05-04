@@ -27,6 +27,8 @@ type Config struct {
 
 func spawnTUI() {
 	app := tview.NewApplication()
+	config := getConfig()
+	pom := createPomodoro(config)
 
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
@@ -35,9 +37,6 @@ func spawnTUI() {
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 	chordmap := map[string]interface{}{}
 	json.Unmarshal([]byte(chordmapJSON), &chordmap)
-
-	config := getConfig()
-	pom := createPomodoro(config)
 
 	layout := tview.NewFlex().SetDirection(tview.FlexRow)
 	frame := tview.NewFrame(layout)
@@ -84,7 +83,7 @@ func spawnTUI() {
 
 			if chord.Active {
 				util.HandleChords(event.Rune(), &chord, chordmap)
-				handleAction(chord.Action, pom, command)
+				handleAction(chord.Action, command)
 			} else {
 				switch event.Rune() {
 				case 'q':
@@ -158,7 +157,7 @@ func attachTicker(timer chan time.Time, interval time.Duration) {
 	}
 }
 
-func handleAction(action string, pom pomodoro, command chan pomodoroCommand) {
+func handleAction(action string, command chan pomodoroCommand) {
 	switch action {
 	case "continue":
 		command <- pomodoroCommand{commandtype: "continue"}
