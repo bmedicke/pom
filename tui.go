@@ -45,9 +45,9 @@ func spawnTUI(config Config, longBreakIn int) {
 	layout.AddItem(statusbar, 1, 0, false)
 
 	header.SetBorderPadding(0, 0, 0, 0)
-	header.AddItem(headerleft, 0, 2, false)
+	header.AddItem(headerleft, 20, 1, false)
 	header.AddItem(headercenter, 0, 1, false)
-	header.AddItem(headerright, 26, 0, false)
+	header.AddItem(headerright, 27, 1, false)
 
 	headerleft.SetChangedFunc(func() { app.Draw() })
 	headerright.SetChangedFunc(func() { app.Draw() })
@@ -172,7 +172,7 @@ func updateHeader(
 		timeleft := (*pom).durationLeft.Round(time.Second)
 		timer := fmt.Sprintf("[%6v]", timeleft)
 
-		right.SetText(fmt.Sprintf("%12v %12v", (*pom).State, timer))
+		right.SetText(fmt.Sprintf("%18v %8v", (*pom).State, timer))
 
 		var leftstatus string
 
