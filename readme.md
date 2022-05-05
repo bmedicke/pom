@@ -34,7 +34,7 @@ pom
   * `dd`/`dc` delete cell content
   * `;` next break/pomodoro
   * `q`/`Q` quit the program
-* *pom* logs all completed pomodoros to: `~/.pom/log.json`
+* *pom* logs all completed pomodoros to: `~/.config/pom/log.json`
 
 ```json
 [
@@ -53,7 +53,7 @@ pom
 ## configuration
 
 * **create the config folders and default hooks with the `--create-config` flag**
-* edit the scripts in `~/.pom/hooks/default`
+* edit the scripts in `~/.config/pom/hooks/default`
 * the scripts are named after when they are called:
   * `work_start`
   * `work_done`
@@ -73,19 +73,19 @@ Here are a couple of **usage scenarios** for hooks:
 * the `default` hooks profile is used when no other is specified
 * you can create custom hook profiles
 * e.g. a profile that toggles a light when pomodoros/breaks end:
-  * create a folder `~/.pom/hooks/light`
+  * create a folder `~/.config/pom/hooks/light`
   * add a `work_done` and a `break_done` script to it
   * add your shell commands to toggle the light
   * start *pom* with your profile: `pom --profile light`
 
 ### show status in tmux
 
-* *pom* keeps a file at `~/.pom/tmux` that always shows the current status
+* *pom* keeps a file at `~/.config/pom/tmux` that always shows the current status
 * when *pom* exits this file is emptied
 
 You can `cat` this into your tmux statusline:
 
 **.tmux.conf**
 ```sh
-set -g status-right "[#(cat ~/.pom/tmux)]"
+set -g status-right "[#(cat ~/.config/pom/tmux)]"
 ```

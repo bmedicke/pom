@@ -16,7 +16,7 @@ var defaultHookContent string
 //go:embed config.json
 var defaultConfigContent string
 
-const configfolder = ".pom"
+const configfolder = ".config/pom"
 const configname = "config.json"
 
 var hookfolder = "hooks/"
@@ -25,12 +25,12 @@ func main() {
 	createConfig := flag.Bool(
 		"create-config",
 		false,
-		"create .pom config folder with example hooks")
+		"create .config/pom config folder with example hooks")
 
 	hookProfile := flag.String(
 		"profile",
 		"default",
-		"select hook profile from ~/.pom/hooks/",
+		"select hook profile from ~/.config/pom/hooks/",
 	)
 
 	flag.Parse()
@@ -86,5 +86,5 @@ func createConfigFilesAndFolders() {
 		}
 	}
 
-	fmt.Println("the config folder can be found at: ~/.pom/")
+	fmt.Println("the config folder can be found at: ~/.config/pom/")
 }
