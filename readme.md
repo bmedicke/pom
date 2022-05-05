@@ -29,17 +29,21 @@ pom
 ```
 
 * **keyboard shortcuts** are loosely based on Vim
-  * `Esc` clear a chord
   * `hjklgG` move around
   * `a`/`A`/`Enter` append to cell
   * `cc` change cell
   * `dd`/`dc` delete cell content
+  * `Esc` clear a key chord
   * `;` next break/pomodoro
   * `q`/`Q` quit the program
 
 ## configuration
 
-* **create the config folders and default hooks with the `--create-config` flag**
+Create the config folder, config file and default hooks at `~/.config/pom/`:
+
+```sh
+pom --create-config
+```
 
 ### hooks
 
@@ -67,7 +71,11 @@ Here are a couple of **usage scenarios** for hooks:
   * create a folder `~/.config/pom/hooks/light`
   * add a `work_done` and a `break_done` script to it
   * add your shell commands to toggle the light
-  * start *pom* with your profile: `pom --profile light`
+  * start *pom* with your profile:
+
+```sh
+pom --profile light
+```
 
 ### show status in tmux
 
