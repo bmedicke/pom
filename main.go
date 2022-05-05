@@ -2,9 +2,11 @@ package main
 
 import (
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,6 +25,15 @@ const (
 
 var hookfolder = "hooks/"
 
+// Config is used for unmarshalling.
+type Config struct {
+	DefaultProject          string `json:"defaultProject"`
+	DefaultTask             string `json:"defaultTask"`
+	DefaultNote             string `json:"defaultNote"`
+	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
+	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
+}
+
 func main() {
 	createConfig := flag.Bool(
 		"create-config",
@@ -36,13 +47,14 @@ func main() {
 	)
 
 	flag.Parse()
+	config := getConfig()
 
 	hookfolder = filepath.Join(hookfolder, *hookProfile)
 
 	if *createConfig {
 		createConfigFilesAndFolders()
 	} else {
-		spawnTUI()
+		spawnTUI(config)
 		clearTmuxFile()
 	}
 }
@@ -89,4 +101,16 @@ func createConfigFilesAndFolders() {
 	}
 
 	fmt.Println("the config folder can be found at: ~/.config/pom/")
+}
+
+func getConfig() Config {
+	var config Config
+	home, _ := os.UserHomeDir()
+	configpath := filepath.Join(home, configfolder, configname)
+
+	file, _ := os.Open(configpath)
+	configJSON, _ := ioutil.ReadAll(file)
+	json.Unmarshal([]byte(configJSON), &config)
+
+	return config
 }
