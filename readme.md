@@ -59,6 +59,7 @@ pom
   * `work_done`
   * `break_start`
   * `break_done`
+  * `pomodoro_cancelled`
 * the interpreter (`sh`, `zsh`, `python3`, etc.) of the script is set via the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
 
 Here are a couple of **usage scenarios** for hooks:

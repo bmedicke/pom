@@ -86,6 +86,7 @@ func createConfigFilesAndFolders() {
 		"work_done",
 		"break_start",
 		"break_done",
+		"pomodoro_cancelled",
 	}
 
 	// create default hook scripts:

@@ -76,10 +76,10 @@ func spawnTUI(config Config) {
 				switch event.Rune() {
 				case 'a', 'A':
 					editTableCell(body, bodytable, command, "append_cell")
-				case ';':
+				case ';': // continue with next state:
 					command <- pomodoroCommand{commandtype: "continue"}
-				case 'q', 'Q':
-					app.Stop()
+				case 'q', 'Q': // quit the app:
+					command <- pomodoroCommand{commandtype: "cancel"}
 				case 'c', 'd': // start chord:
 					util.HandleChords(event.Rune(), &chord, chordmap)
 				}
@@ -90,7 +90,7 @@ func spawnTUI(config Config) {
 	)
 
 	createBodytable(bodytable, config)
-	go handlePomodoroState(&pom, statusbar, command, config)
+	go handlePomodoroState(&pom, statusbar, app, command, config)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
 	app.SetRoot(frame, true)

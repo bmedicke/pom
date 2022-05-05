@@ -37,6 +37,7 @@ type pomodoroCommand struct {
 func handlePomodoroState(
 	pom *pomodoro,
 	statusbar *tview.TextView,
+	app *tview.Application,
 	command chan pomodoroCommand,
 	config Config,
 ) {
@@ -57,6 +58,14 @@ func handlePomodoroState(
 			switch cmd.commandtype {
 			case "continue":
 				(*pom).waiting = false
+			case "cancel":
+				if (*pom).State == "work" {
+					(*pom).State = "cancelled"
+					(*pom).StopTime = time.Now()
+					logPomodoro(*pom)
+					executeShellHook("pomodoro_cancelled")
+				}
+				app.Stop()
 			case "update_project":
 				(*pom).Project = cmd.payload
 			case "update_task":
