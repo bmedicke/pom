@@ -159,15 +159,6 @@ func createBodytable(bodytable *tview.Table, config Config) {
 	}
 }
 
-// TODO: move this to util.
-func attachTicker(timer chan time.Time, interval time.Duration) {
-	timer <- time.Now() // send one tick immediately.
-	t := time.NewTicker(interval)
-	for c := range t.C {
-		timer <- c
-	}
-}
-
 func handleAction(
 	action string,
 	command chan pomodoroCommand,
@@ -187,7 +178,7 @@ func updateHeader(
 	pom *pomodoro,
 ) {
 	tick := make(chan time.Time)
-	go attachTicker(tick, time.Millisecond*200)
+	go util.AttachTicker(tick, time.Millisecond*200)
 
 	for {
 		<-tick

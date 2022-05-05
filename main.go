@@ -16,8 +16,10 @@ var defaultHookContent string
 //go:embed config.json
 var defaultConfigContent string
 
-const configfolder = ".config/pom"
-const configname = "config.json"
+const (
+	configfolder = ".config/pom"
+	configname   = "config.json"
+)
 
 var hookfolder = "hooks/"
 

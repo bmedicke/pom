@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/bmedicke/bhdr/util"
 	"github.com/rivo/tview"
 )
 
@@ -44,7 +45,7 @@ func handlePomodoroState(
 	// TODO: use channel for changing the statusbar.
 	// TODO: listen to start/stop events from: main app & http API.
 	tick := make(chan time.Time)
-	go attachTicker(tick, time.Millisecond*200)
+	go util.AttachTicker(tick, time.Millisecond*200)
 	go writeTmuxFile(pom)
 
 	for {
@@ -112,7 +113,7 @@ func handlePomodoroState(
 
 func writeTmuxFile(pom *pomodoro) {
 	tick := make(chan time.Time)
-	go attachTicker(tick, time.Second*1)
+	go util.AttachTicker(tick, time.Second*1)
 
 	home, err := os.UserHomeDir()
 	if err != nil {
