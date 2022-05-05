@@ -47,7 +47,7 @@ func spawnTUI(config Config) {
 	header.SetBorderPadding(0, 0, 0, 0)
 	header.AddItem(headerleft, 0, 2, false)
 	header.AddItem(headercenter, 0, 1, false)
-	header.AddItem(headerright, 17, 0, false)
+	header.AddItem(headerright, 24, 0, false)
 
 	headerleft.SetChangedFunc(func() { app.Draw() })
 	headerright.SetChangedFunc(func() { app.Draw() })
@@ -170,8 +170,8 @@ func updateHeader(
 	for {
 		<-tick
 		timeleft := (*pom).durationLeft.Round(time.Second)
-		// TODO left pad text:
-		right.SetText(fmt.Sprintf("%v [%v]", (*pom).State, timeleft))
+		timer := fmt.Sprintf("[%6v]", timeleft)
+		right.SetText(fmt.Sprintf("%12v %10v", (*pom).State, timer))
 
 		var color tcell.Color
 		switch (*pom).State {
