@@ -189,8 +189,8 @@ func createPomodoro(config Config) pomodoro {
 	pom := pomodoro{
 		State:         "ready",
 		Project:       config.DefaultProject,
-		Task:          config.DefaultNote,
-		Note:          config.DefaultTask,
+		Task:          config.DefaultTask,
+		Note:          config.DefaultNote,
 		Duration:      pomodoroDuration,
 		breakDuration: breakDuration,
 		durationLeft:  pomodoroDuration,
