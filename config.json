@@ -3,5 +3,6 @@
   "defaultTask": "",
   "defaultNote": "",
   "pomodoroDurationMinutes": 25,
-  "breakDurationMinutes": 5
+  "breakDurationMinutes": 5,
+  "writeTmuxFile": false
 }

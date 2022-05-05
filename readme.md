@@ -9,6 +9,7 @@
 * [installation](#installation)
 * [usage](#usage)
 * [configuration](#configuration)
+  * [hooks](#hooks)
   * [hook profiles](#hook-profiles)
   * [show status in tmux](#show-status-in-tmux)
 
@@ -53,6 +54,9 @@ pom
 ## configuration
 
 * **create the config folders and default hooks with the `--create-config` flag**
+
+### hooks
+
 * edit the scripts in `~/.config/pom/hooks/default`
 * the scripts are named after when they are called:
   * `work_start`
@@ -81,10 +85,12 @@ Here are a couple of **usage scenarios** for hooks:
 
 ### show status in tmux
 
-* *pom* keeps a file at `~/.config/pom/tmux` that always shows the current status
-* when *pom* exits this file is emptied
+* if you set `writeTmuxFile` in `~/.config/pom/config.json` to `true`:
+  * *pom* keeps a file at `~/.config/pom/tmux` that always shows the current status
+  * when *pom* exits this file is emptied
+* this option defaults to `false`
 
-You can `cat` this into your tmux statusline:
+You can `cat` this file into your tmux statusline:
 
 **.tmux.conf**
 ```sh

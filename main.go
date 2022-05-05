@@ -32,6 +32,7 @@ type Config struct {
 	DefaultNote             string `json:"defaultNote"`
 	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
 	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
+	WriteTmuxFile           bool   `json:"writeTmuxFile"`
 }
 
 func main() {
@@ -55,7 +56,9 @@ func main() {
 		createConfigFilesAndFolders()
 	} else {
 		spawnTUI(config)
-		clearTmuxFile()
+		if config.WriteTmuxFile {
+			clearTmuxFile()
+		}
 	}
 }
 

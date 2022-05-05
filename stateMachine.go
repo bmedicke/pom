@@ -47,7 +47,9 @@ func handlePomodoroState(
 	// TODO: listen to start/stop events from: main app & http API.
 	tick := make(chan time.Time)
 	go util.AttachTicker(tick, time.Millisecond*200)
-	go writeTmuxFile(pom)
+	if config.WriteTmuxFile {
+		go writeTmuxFile(pom)
+	}
 
 	for {
 		<-tick
