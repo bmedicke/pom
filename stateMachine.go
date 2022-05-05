@@ -46,7 +46,6 @@ func handlePomodoroState(
 ) {
 	// this is the only place where the pomodoro should be changed,
 	// all external changes should be triggered via channels!
-	// TODO: listen to start/stop events from: main app & http API.
 	tick := make(chan time.Time)
 	go util.AttachTicker(tick, time.Millisecond*200)
 	if config.WriteTmuxFile {
