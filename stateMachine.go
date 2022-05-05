@@ -15,18 +15,21 @@ import (
 )
 
 type pomodoro struct {
-	Project        string
-	Task           string
-	Note           string
-	Duration       time.Duration
-	StartTime      time.Time
-	State          string
-	StopTime       time.Time
-	breakDuration  time.Duration
-	breakStartTime time.Time
-	breakStopTime  time.Time
-	durationLeft   time.Duration
-	waiting        bool
+	Project                     string
+	Task                        string
+	Note                        string
+	Duration                    time.Duration
+	StartTime                   time.Time
+	State                       string
+	StopTime                    time.Time
+	breakDuration               time.Duration
+	breakStartTime              time.Time
+	breakStopTime               time.Time
+	longBreakDuration           time.Duration
+	pomodorosUntilLongBreak     int
+	pomodorosUntilLongBreakLeft int
+	durationLeft                time.Duration
+	waiting                     bool
 }
 
 type pomodoroCommand struct {
@@ -103,22 +106,45 @@ func handlePomodoroState(
 				(*pom).durationLeft = remaining
 			}
 		case "work_done":
-			statusbar.SetText(executeShellHook("break_start"))
-			(*pom).State = "break"
+			(*pom).pomodorosUntilLongBreakLeft--
+
+			if (*pom).pomodorosUntilLongBreakLeft == 0 {
+				statusbar.SetText("longbreak_start")
+				(*pom).State = "longbreak"
+			} else {
+				statusbar.SetText(executeShellHook("break_start"))
+				(*pom).State = "break"
+			}
+
 			(*pom).breakStartTime = time.Now()
-		case "break":
+		case "break", "longbreak":
 			delta := time.Now().Sub((*pom).breakStartTime)
-			remaining := (*pom).breakDuration - delta
+			var remaining time.Duration
+
+			if (*pom).State == "longbreak" {
+				remaining = (*pom).longBreakDuration - delta
+			} else {
+				remaining = (*pom).breakDuration - delta
+			}
+
 			if remaining <= 0 {
-				statusbar.SetText(executeShellHook("break_done"))
-				(*pom).State = "break_done"
+				if (*pom).State == "longbreak" {
+					statusbar.SetText(executeShellHook("longbreak_done"))
+					(*pom).State = "longbreak_done"
+				} else {
+					statusbar.SetText(executeShellHook("break_done"))
+					(*pom).State = "break_done"
+				}
 				(*pom).breakStopTime = time.Now()
 				(*pom).durationLeft = (*pom).Duration
 				(*pom).waiting = true
 			} else {
 				(*pom).durationLeft = remaining
 			}
-		case "break_done":
+		case "break_done", "longbreak_done":
+			if (*pom).State == "longbreak_done" {
+				(*pom).pomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
+			}
 			(*pom).State = "ready"
 			(*pom).durationLeft = (*pom).Duration
 		}
@@ -190,25 +216,37 @@ func createPomodoro(config Config) pomodoro {
 	breakDuration := time.Duration(
 		config.BreakDurationMinutes,
 	) * time.Minute
+	longBreakDuration := time.Duration(
+		config.LongBreakDurationMinutes,
+	) * time.Minute
+	longBreakAfterPomodoros := config.LongBreakAfterPomodoros
 
-	// set sensible default durations
-	// (in case of missing config file):
+	// set sensible defaults (in case of missing config file):
 	if pomodoroDuration == 0 {
 		pomodoroDuration = 25 * time.Minute
 	}
 	if breakDuration == 0 {
 		breakDuration = 5 * time.Minute
 	}
+	if longBreakDuration == 0 {
+		longBreakDuration = 30 * time.Minute
+	}
+	if longBreakAfterPomodoros == 0 {
+		longBreakAfterPomodoros = 3
+	}
 
 	pom := pomodoro{
-		State:         "ready",
-		Project:       config.DefaultProject,
-		Task:          config.DefaultTask,
-		Note:          config.DefaultNote,
-		Duration:      pomodoroDuration,
-		breakDuration: breakDuration,
-		durationLeft:  pomodoroDuration,
-		waiting:       true,
+		State:                       "ready",
+		Project:                     config.DefaultProject,
+		Task:                        config.DefaultTask,
+		Note:                        config.DefaultNote,
+		Duration:                    pomodoroDuration,
+		breakDuration:               breakDuration,
+		longBreakDuration:           longBreakDuration,
+		durationLeft:                pomodoroDuration,
+		pomodorosUntilLongBreak:     longBreakAfterPomodoros,
+		pomodorosUntilLongBreakLeft: longBreakAfterPomodoros,
+		waiting:                     true,
 	}
 	return pom
 }

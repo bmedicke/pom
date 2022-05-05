@@ -27,13 +27,15 @@ var hookfolder = "hooks/"
 
 // Config is used for unmarshalling.
 type Config struct {
-	DefaultProject          string `json:"defaultProject"`
-	DefaultTask             string `json:"defaultTask"`
-	DefaultNote             string `json:"defaultNote"`
-	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
-	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
-	WriteTmuxFile           bool   `json:"writeTmuxFile"`
-	LogJSON                 bool   `json:"logJSON"`
+	DefaultProject           string `json:"defaultProject"`
+	DefaultTask              string `json:"defaultTask"`
+	DefaultNote              string `json:"defaultNote"`
+	PomodoroDurationMinutes  int    `json:"pomodoroDurationMinutes"`
+	BreakDurationMinutes     int    `json:"breakDurationMinutes"`
+	LongBreakDurationMinutes int    `json:"longBreakDurationMinutes"`
+	LongBreakAfterPomodoros  int    `json:"longBreakAfterPomodoros"`
+	WriteTmuxFile            bool   `json:"writeTmuxFile"`
+	LogJSON                  bool   `json:"logJSON"`
 }
 
 func main() {
@@ -90,6 +92,8 @@ func createConfigFilesAndFolders() {
 		"work_done",
 		"break_start",
 		"break_done",
+		"longbreak_start",
+		"longbreak_done",
 		"pomodoro_cancelled",
 	}
 

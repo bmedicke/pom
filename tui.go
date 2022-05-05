@@ -179,8 +179,12 @@ func updateHeader(
 			color = tcell.ColorDarkOliveGreen
 		case "break":
 			color = tcell.ColorBlue
-		case "break_done", "work_done":
+		case "longbreak":
+			color = tcell.ColorDarkBlue
+		case "break_done", "longbreak_done", "work_done":
 			color = tcell.ColorDarkRed
+		case "ready":
+			color = tcell.ColorBlack
 		}
 
 		left.SetBackgroundColor(color)
