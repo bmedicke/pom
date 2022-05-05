@@ -77,8 +77,8 @@ func createConfigFilesAndFolders() {
 	_, err = os.Stat(configfile)
 	if errors.Is(err, os.ErrNotExist) {
 		f, _ := os.Create(configfile)
-		f.WriteString(defaultConfigContent)
 		defer f.Close()
+		f.WriteString(defaultConfigContent)
 	}
 
 	defaultHooks := []string{
@@ -94,9 +94,9 @@ func createConfigFilesAndFolders() {
 		_, err := os.Stat(file)
 		if errors.Is(err, os.ErrNotExist) {
 			f, _ := os.Create(file)
+			defer f.Close()
 			f.WriteString(defaultHookContent)
 			os.Chmod(file, 0700) // make it executable.
-			defer f.Close()
 		}
 	}
 
