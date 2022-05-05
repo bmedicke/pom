@@ -14,9 +14,9 @@ import (
 //go:embed chordmap.json
 var chordmapJSON string
 
-func spawnTUI(config Config) {
+func spawnTUI(config Config, longBreakIn int) {
 	app := tview.NewApplication()
-	pom := createPomodoro(config)
+	pom := createPomodoro(config, longBreakIn)
 
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
@@ -47,7 +47,7 @@ func spawnTUI(config Config) {
 	header.SetBorderPadding(0, 0, 0, 0)
 	header.AddItem(headerleft, 0, 2, false)
 	header.AddItem(headercenter, 0, 1, false)
-	header.AddItem(headerright, 24, 0, false)
+	header.AddItem(headerright, 26, 0, false)
 
 	headerleft.SetChangedFunc(func() { app.Draw() })
 	headerright.SetChangedFunc(func() { app.Draw() })
@@ -171,7 +171,25 @@ func updateHeader(
 		<-tick
 		timeleft := (*pom).durationLeft.Round(time.Second)
 		timer := fmt.Sprintf("[%6v]", timeleft)
-		right.SetText(fmt.Sprintf("%12v %10v", (*pom).State, timer))
+
+		right.SetText(fmt.Sprintf("%12v %12v", (*pom).State, timer))
+
+		var leftstatus string
+
+		if (*pom).State == "longbreak" {
+			leftstatus = "enjoy your break :)"
+		} else {
+			leftstatus = fmt.Sprint(
+				"long break in ",
+				(*pom).pomodorosUntilLongBreakLeft,
+				" pom",
+			)
+			if (*pom).pomodorosUntilLongBreakLeft > 1 {
+				leftstatus += "s"
+			}
+		}
+
+		left.SetText(leftstatus)
 
 		var color tcell.Color
 		switch (*pom).State {

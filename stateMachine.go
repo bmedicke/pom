@@ -97,7 +97,14 @@ func handlePomodoroState(
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
-				(*pom).durationLeft = (*pom).breakDuration
+
+				(*pom).pomodorosUntilLongBreakLeft--
+				if (*pom).pomodorosUntilLongBreakLeft == 0 {
+					(*pom).durationLeft = (*pom).longBreakDuration
+				} else {
+					(*pom).durationLeft = (*pom).breakDuration
+				}
+
 				if config.LogJSON {
 					go logPomodoro(*pom)
 				}
@@ -105,8 +112,6 @@ func handlePomodoroState(
 				(*pom).durationLeft = remaining
 			}
 		case "work_done":
-			(*pom).pomodorosUntilLongBreakLeft--
-
 			if (*pom).pomodorosUntilLongBreakLeft == 0 {
 				statusbar.SetText("longbreak_start")
 				(*pom).State = "longbreak"
@@ -134,16 +139,19 @@ func handlePomodoroState(
 					statusbar.SetText(executeShellHook("break_done"))
 					(*pom).State = "break_done"
 				}
+
 				(*pom).breakStopTime = time.Now()
+
 				(*pom).durationLeft = (*pom).Duration
+				if (*pom).pomodorosUntilLongBreakLeft == 0 {
+					(*pom).pomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
+				}
+
 				(*pom).waiting = true
 			} else {
 				(*pom).durationLeft = remaining
 			}
 		case "break_done", "longbreak_done":
-			if (*pom).State == "longbreak_done" {
-				(*pom).pomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
-			}
 			(*pom).State = "ready"
 			(*pom).durationLeft = (*pom).Duration
 		}
@@ -208,7 +216,7 @@ func logPomodoro(newPomodoro pomodoro) {
 	file.WriteString(string(newJSON))
 }
 
-func createPomodoro(config Config) pomodoro {
+func createPomodoro(config Config, longBreakIn int) pomodoro {
 	pomodoroDuration := time.Duration(
 		config.PomodoroDurationMinutes,
 	) * time.Minute
@@ -233,6 +241,9 @@ func createPomodoro(config Config) pomodoro {
 	if longBreakAfterPomodoros == 0 {
 		longBreakAfterPomodoros = 3
 	}
+	if longBreakIn < 1 {
+		longBreakIn = longBreakAfterPomodoros
+	}
 
 	pom := pomodoro{
 		State:                       "ready",
@@ -244,7 +255,7 @@ func createPomodoro(config Config) pomodoro {
 		longBreakDuration:           longBreakDuration,
 		durationLeft:                pomodoroDuration,
 		pomodorosUntilLongBreak:     longBreakAfterPomodoros,
-		pomodorosUntilLongBreakLeft: longBreakAfterPomodoros,
+		pomodorosUntilLongBreakLeft: longBreakIn,
 		waiting:                     true,
 	}
 	return pom

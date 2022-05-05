@@ -50,6 +50,12 @@ func main() {
 		"select hook profile from ~/.config/pom/hooks/",
 	)
 
+	longBreakIn := flag.Int(
+		"longbreak-in",
+		-1,
+		"long break in [c] pomodoros",
+	)
+
 	flag.Parse()
 	config := getConfig()
 
@@ -58,7 +64,7 @@ func main() {
 	if *createConfig {
 		createConfigFilesAndFolders()
 	} else {
-		spawnTUI(config)
+		spawnTUI(config, *longBreakIn)
 		if config.WriteTmuxFile {
 			clearTmuxFile()
 		}

@@ -8,6 +8,7 @@
 
 * [installation](#installation)
 * [usage](#usage)
+* [flags](#flags)
 * [configuration](#configuration)
   * [hooks](#hooks)
   * [hook profiles](#hook-profiles)
@@ -36,6 +37,14 @@ pom
   * `Esc` clear a key chord
   * `;` next break/pomodoro
   * `q`/`Q` quit the program
+
+## flags
+
+* `-h` show the help
+* `--profile <subdir>` select non-default [hook profile](#hook-profiles)
+* `--create-config` create config files, see [next section](#configuration)
+* `--longbreak-in <uint>` overwrite number of pomodoros required for the first long break
+
 
 ## configuration
 
