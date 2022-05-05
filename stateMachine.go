@@ -35,7 +35,7 @@ type pomodoroCommand struct {
 
 func handlePomodoroState(
 	pom *pomodoro,
-	view *tview.TextView,
+	statusbar *tview.TextView,
 	command chan pomodoroCommand,
 	config Config,
 ) {
@@ -71,14 +71,14 @@ func handlePomodoroState(
 		}
 		switch (*pom).State {
 		case "ready":
-			view.SetText(executeShellHook("work_start"))
+			statusbar.SetText(executeShellHook("work_start"))
 			(*pom).State = "work"
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
 			remaining := (*pom).Duration - delta
 			if remaining <= 0 {
-				view.SetText(executeShellHook("work_done"))
+				statusbar.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
@@ -88,14 +88,14 @@ func handlePomodoroState(
 				(*pom).durationLeft = remaining
 			}
 		case "work_done":
-			view.SetText(executeShellHook("break_start"))
+			statusbar.SetText(executeShellHook("break_start"))
 			(*pom).State = "break"
 			(*pom).breakStartTime = time.Now()
 		case "break":
 			delta := time.Now().Sub((*pom).breakStartTime)
 			remaining := (*pom).breakDuration - delta
 			if remaining <= 0 {
-				view.SetText(executeShellHook("break_done"))
+				statusbar.SetText(executeShellHook("break_done"))
 				(*pom).State = "break_done"
 				(*pom).breakStopTime = time.Now()
 				(*pom).durationLeft = (*pom).Duration

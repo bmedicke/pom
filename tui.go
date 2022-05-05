@@ -110,7 +110,7 @@ func spawnTUI() {
 	app.SetFocus(bodytable).Run()
 }
 
-func createBodytable(view *tview.Table, config Config) {
+func createBodytable(bodytable *tview.Table, config Config) {
 	b := []map[string]string{
 		{
 			"id":       "projekt",
@@ -154,7 +154,7 @@ func createBodytable(view *tview.Table, config Config) {
 			} else {
 				cell.SetSelectable(false)
 			}
-			view.SetCell(row, col, cell)
+			bodytable.SetCell(row, col, cell)
 		}
 	}
 }
