@@ -64,7 +64,9 @@ func handlePomodoroState(
 				if (*pom).State == "work" {
 					(*pom).State = "incomplete"
 					(*pom).StopTime = time.Now()
-					logPomodoro(*pom)
+					if config.LogJSON {
+						logPomodoro(*pom)
+					}
 					executeShellHook("pomodoro_cancelled")
 				}
 				app.Stop()
@@ -95,7 +97,9 @@ func handlePomodoroState(
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
 				(*pom).durationLeft = (*pom).breakDuration
-				go logPomodoro(*pom)
+				if config.LogJSON {
+					go logPomodoro(*pom)
+				}
 			} else {
 				(*pom).durationLeft = remaining
 			}

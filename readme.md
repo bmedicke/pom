@@ -12,6 +12,7 @@
   * [hooks](#hooks)
   * [hook profiles](#hook-profiles)
   * [show status in tmux](#show-status-in-tmux)
+  * [JSON logging](#json-logging)
 
 <!-- vim-markdown-toc -->
 
@@ -35,21 +36,6 @@ pom
   * `dd`/`dc` delete cell content
   * `;` next break/pomodoro
   * `q`/`Q` quit the program
-* *pom* logs all completed pomodoros to: `~/.config/pom/log.json`
-
-```json
-[
-  {
-    "Project": "master thesis",
-    "Task": "research",
-    "Note": "mode locking",
-    "Duration": 60000000000,
-    "State": "work_done",
-    "StartTime": "2022-05-03T13:07:40.091129279+02:00",
-    "StopTime": "2022-05-03T13:08:40.285970461+02:00"
-  },
-...
-```
 
 ## configuration
 
@@ -85,14 +71,34 @@ Here are a couple of **usage scenarios** for hooks:
 
 ### show status in tmux
 
-* if you set `writeTmuxFile` in `~/.config/pom/config.json` to `true`:
+* if `writeTmuxFile` in `~/.config/pom/config.json` is set to `true`:
   * *pom* keeps a file at `~/.config/pom/tmux` that always shows the current status
   * when *pom* exits this file is emptied
-* this option defaults to `false`
 
 You can `cat` this file into your tmux statusline:
 
 **.tmux.conf**
 ```sh
 set -g status-right "[#(cat ~/.config/pom/tmux)]"
+```
+
+### JSON logging
+
+* if `logJSON` in `~/.config/pom/config.json` is set to `true`:
+  * *pom* logs all complete and incomplete pomodoros to: `~/.config/pom/log.json`
+
+**~/.config/pom/log.json**
+
+```json
+[
+  {
+    "Project": "master thesis",
+    "Task": "research",
+    "Note": "mode locking",
+    "State": "work_done",
+    "Duration": 60000000000,
+    "StartTime": "2022-05-03T13:07:40.091129279+02:00",
+    "StopTime": "2022-05-03T13:08:40.285970461+02:00"
+  },
+...
 ```

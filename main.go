@@ -33,6 +33,7 @@ type Config struct {
 	PomodoroDurationMinutes int    `json:"pomodoroDurationMinutes"`
 	BreakDurationMinutes    int    `json:"breakDurationMinutes"`
 	WriteTmuxFile           bool   `json:"writeTmuxFile"`
+	LogJSON                 bool   `json:"logJSON"`
 }
 
 func main() {
