@@ -71,7 +71,7 @@ func spawnTUI(config Config) {
 
 			if chord.Active {
 				util.HandleChords(event.Rune(), &chord, chordmap)
-				handleAction(chord.Action, command, body, bodytable)
+				handleChordAction(chord.Action, command, body, bodytable)
 			} else {
 				switch event.Rune() {
 				case 'a', 'A':
@@ -79,7 +79,7 @@ func spawnTUI(config Config) {
 				case ';': // continue with next state:
 					command <- pomodoroCommand{commandtype: "continue"}
 				case 'q', 'Q': // quit the app:
-					command <- pomodoroCommand{commandtype: "cancel"}
+					command <- pomodoroCommand{commandtype: "quit_app"}
 				case 'c', 'd': // start chord:
 					util.HandleChords(event.Rune(), &chord, chordmap)
 				}
@@ -146,7 +146,7 @@ func createBodytable(bodytable *tview.Table, config Config) {
 	}
 }
 
-func handleAction(
+func handleChordAction(
 	action string,
 	command chan pomodoroCommand,
 	body *tview.Pages,
