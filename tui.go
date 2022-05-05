@@ -100,7 +100,7 @@ func spawnTUI(config Config) {
 func createBodytable(bodytable *tview.Table, config Config) {
 	b := []map[string]string{
 		{
-			"id":       "projekt",
+			"id":       "project",
 			"onchange": "update_project",
 			"type":     "editable",
 			"value":    config.DefaultProject,
