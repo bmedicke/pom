@@ -42,7 +42,9 @@ func spawnTUI(config Config, longBreakIn int) {
 
 	layout.AddItem(header, 1, 0, false)
 	layout.AddItem(body, 0, 1, true)
-	layout.AddItem(statusbar, 1, 0, false)
+	if !config.HideFooter {
+		layout.AddItem(statusbar, 1, 0, false)
+	}
 
 	header.SetBorderPadding(0, 0, 0, 0)
 	header.AddItem(headerleft, 20, 1, false)
@@ -93,7 +95,11 @@ func spawnTUI(config Config, longBreakIn int) {
 	go handlePomodoroState(&pom, statusbar, app, command, config)
 	go updateHeader(headerleft, headercenter, headerright, &pom)
 
-	app.SetRoot(frame, true)
+	if config.HideHeader {
+		app.SetRoot(layout, true)
+	} else {
+		app.SetRoot(frame, true)
+	}
 	app.SetFocus(bodytable).Run()
 }
 

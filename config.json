@@ -7,5 +7,7 @@
   "longBreakDurationMinutes": 30,
   "longBreakAfterPomodoros": 3,
   "writeTmuxFile": true,
-  "logJSON": true
+  "logJSON": true,
+  "hideHeader": false,
+  "hideFooter": false
 }

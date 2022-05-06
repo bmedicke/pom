@@ -36,6 +36,8 @@ type Config struct {
 	LongBreakAfterPomodoros  int    `json:"longBreakAfterPomodoros"`
 	WriteTmuxFile            bool   `json:"writeTmuxFile"`
 	LogJSON                  bool   `json:"logJSON"`
+	HideHeader               bool   `json:"hideHeader"`
+	HideFooter               bool   `json:"hideFooter"`
 }
 
 func main() {
