@@ -37,6 +37,38 @@ type pomodoroCommand struct {
 	payload     string
 }
 
+func handlePomodoroCommand(
+	command chan pomodoroCommand,
+	pom *pomodoro,
+	config Config,
+	app *tview.Application,
+) {
+	select {
+	case cmd := <-command:
+		switch cmd.commandtype {
+		case "continue":
+			(*pom).waiting = false
+		case "quit_app":
+			if (*pom).State == "work" {
+				(*pom).State = "incomplete"
+				(*pom).StopTime = time.Now()
+				if config.LogJSON {
+					logPomodoro(*pom)
+				}
+				executeShellHook("pomodoro_cancelled")
+			}
+			app.Stop()
+		case "update_project":
+			(*pom).Project = cmd.payload
+		case "update_task":
+			(*pom).Task = cmd.payload
+		case "update_note":
+			(*pom).Note = cmd.payload
+		}
+	default:
+	}
+}
+
 func handlePomodoroState(
 	pom *pomodoro,
 	statusbar *tview.TextView,
@@ -56,31 +88,9 @@ func handlePomodoroState(
 		<-tick
 
 		// non-blocking command handling:
-		select {
-		case cmd := <-command:
-			switch cmd.commandtype {
-			case "continue":
-				(*pom).waiting = false
-			case "quit_app":
-				if (*pom).State == "work" {
-					(*pom).State = "incomplete"
-					(*pom).StopTime = time.Now()
-					if config.LogJSON {
-						logPomodoro(*pom)
-					}
-					executeShellHook("pomodoro_cancelled")
-				}
-				app.Stop()
-			case "update_project":
-				(*pom).Project = cmd.payload
-			case "update_task":
-				(*pom).Task = cmd.payload
-			case "update_note":
-				(*pom).Note = cmd.payload
-			}
-		default:
-		}
+		handlePomodoroCommand(command, pom, config, app)
 
+		// state handling:
 		if (*pom).waiting {
 			continue
 		}
