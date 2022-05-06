@@ -10,7 +10,7 @@ var _ = API("pom", func() {
 	})
 })
 
-var _ = Service("pom", func() {
+var _ = Service("get", func() {
 	Method("state", func() {
 		Result(String)
 		HTTP(func() {
