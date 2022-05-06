@@ -9,5 +9,8 @@
   "writeTmuxFile": true,
   "logJSON": true,
   "hideHeader": false,
-  "hideFooter": false
+  "hideFooter": false,
+  "webAPI": false,
+  "port": 8421,
+  "interface": "0.0.0.0"
 }

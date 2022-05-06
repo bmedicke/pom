@@ -38,6 +38,9 @@ type Config struct {
 	LogJSON                  bool   `json:"logJSON"`
 	HideHeader               bool   `json:"hideHeader"`
 	HideFooter               bool   `json:"hideFooter"`
+	WebAPI                   bool   `json:"webAPI"`
+	PortWebAPI               int    `json:"port"`
+	InterfaceWebAPI          string `json:"interface"`
 }
 
 func main() {
