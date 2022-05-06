@@ -123,7 +123,7 @@ func handlePomodoroState(
 			}
 		case "work_done":
 			if (*pom).pomodorosUntilLongBreakLeft == 0 {
-				statusbar.SetText("longbreak_start")
+				statusbar.SetText(executeShellHook("longbreak_start"))
 				(*pom).State = "longbreak"
 			} else {
 				statusbar.SetText(executeShellHook("break_start"))
