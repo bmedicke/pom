@@ -129,10 +129,17 @@ func createBodytable(bodytable *tview.Table, config Config) {
 			"type":     "editable",
 			"value":    config.DefaultNote,
 		},
-		{"id": "server", "value": config.Server},
 	}
-	cols, rows := 3, len(b)
 
+	if config.EnableAPI {
+		b = append(b, map[string]string{
+			"id":    "server",
+			"value": config.Server,
+		},
+		)
+	}
+
+	cols, rows := 3, len(b)
 	for row := 0; row < rows; row++ {
 		for col := 0; col < cols; col++ {
 			var s string
