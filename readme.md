@@ -1,7 +1,7 @@
 # pom
 
 *pom* is a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique)
-timer with vim keybindings, scriptable hooks, web API, tmux support and json logging.
+timer with vim keybindings, scriptable hooks, a web API, tmux support and json logging.
 
 ![image](https://user-images.githubusercontent.com/173962/166680550-d70ed16a-bc93-414e-bf04-ad42abcf9f96.png)
 
