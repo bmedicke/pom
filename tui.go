@@ -4,10 +4,12 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
 	"github.com/gdamore/tcell/v2"
+	"github.com/labstack/echo/v4"
 	"github.com/rivo/tview"
 )
 
@@ -17,6 +19,13 @@ var chordmapJSON string
 func spawnTUI(config Config, longBreakIn int) {
 	app := tview.NewApplication()
 	pom := createPomodoro(config, longBreakIn)
+
+	// API:
+	server := echo.New()
+	server.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "hello wolrd")
+	})
+	go server.Start(":8421")
 
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
@@ -125,7 +134,7 @@ func createBodytable(bodytable *tview.Table, config Config) {
 			"type":     "editable",
 			"value":    config.DefaultNote,
 		},
-		{"id": "server", "value": "0.0.0.0:8421/api"},
+		{"id": "server", "value": "0.0.0.0:8421"},
 	}
 	cols, rows := 3, len(b)
 
