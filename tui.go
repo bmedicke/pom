@@ -80,8 +80,10 @@ func spawnTUI(config Config, longBreakIn int) {
 					editTableCell(body, bodytable, command, "append_cell")
 				case ';': // continue with next state:
 					command <- pomodoroCommand{commandtype: "continue"}
-				case 'q', 'Q': // quit the app:
-					command <- pomodoroCommand{commandtype: "quit_app"}
+				case 'q': // quit the app:
+					command <- pomodoroCommand{commandtype: "quit_app_save"}
+				case 'Q': // quit without saving incomplete pomodoro:
+					command <- pomodoroCommand{commandtype: "quit_app_nosave"}
 				case 'c', 'd': // start chord:
 					util.HandleChords(event.Rune(), &chord, chordmap)
 				}

@@ -36,7 +36,8 @@ pom
   * `dd`/`dc` delete cell content
   * `Esc` clear a key chord
   * `;` next break/pomodoro
-  * `q`/`Q` quit the program
+  * `q` quit the program
+  * `Q` quit the program (don't save incomplete pomodoros)
 
 ## flags
 

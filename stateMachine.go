@@ -48,11 +48,11 @@ func handlePomodoroCommand(
 		switch cmd.commandtype {
 		case "continue":
 			(*pom).waiting = false
-		case "quit_app":
+		case "quit_app_save", "quit_app_nosave":
 			if (*pom).State == "work" {
 				(*pom).State = "incomplete"
 				(*pom).StopTime = time.Now()
-				if config.LogJSON {
+				if config.LogJSON && cmd.commandtype == "quit_app_save" {
 					logPomodoro(*pom)
 				}
 				executeShellHook("pomodoro_cancelled")
