@@ -40,6 +40,11 @@ pom
   * `;` next break/pomodoro
   * `q` quit the program
   * `Q` quit the program (don't save incomplete pomodoros)
+* while editing a cell [readline keybindings](https://en.wikipedia.org/wiki/GNU_Readline) are available
+  * `ctrl-a` jump to beginning
+  * `ctrl-e` jump to end
+  * `ctrl-k` delete to the right of cursor
+  * etc.
 
 ## flags
 
