@@ -132,3 +132,20 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
 * there are two endpoints that respond with JSON
   * GET `/continue`: starts the next state (same as pressing `;`)
   * GET `/ws`: upgrades connection to a websocket and streams infos about the current pomodoro twice a second
+
+```sh
+websocat ws://localhost:8421/ws | jq
+```
+
+```json
+{
+  "Project": "pom",
+  "Task": "hide server from table if disabled",
+  "Note": "go lang",
+  "Duration": 1500000000000,
+  "StartTime": "2022-05-07T14:23:36.755337148+02:00",
+  "State": "work",
+  "StopTime": "0001-01-01T00:00:00Z"
+}
+...
+```
