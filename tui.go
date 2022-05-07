@@ -21,11 +21,13 @@ func spawnTUI(config Config, longBreakIn int) {
 	pom := createPomodoro(config, longBreakIn)
 
 	// API:
-	server := echo.New()
-	server.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "hello wolrd")
-	})
-	go server.Start(":8421")
+	if config.EnableAPI {
+		server := echo.New()
+		server.GET("/", func(c echo.Context) error {
+			return c.String(http.StatusOK, "hello world")
+		})
+		go server.Start(config.Server)
+	}
 
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
@@ -134,7 +136,7 @@ func createBodytable(bodytable *tview.Table, config Config) {
 			"type":     "editable",
 			"value":    config.DefaultNote,
 		},
-		{"id": "server", "value": "0.0.0.0:8421"},
+		{"id": "server", "value": config.Server},
 	}
 	cols, rows := 3, len(b)
 

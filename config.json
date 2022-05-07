@@ -9,5 +9,7 @@
   "writeTmuxFile": true,
   "logJSON": true,
   "hideHeader": false,
-  "hideFooter": false
+  "hideFooter": false,
+  "enableAPI": true,
+  "server": "0.0.0.0:8421"
 }
