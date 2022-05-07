@@ -22,7 +22,7 @@ func spawnTUI(config Config, longBreakIn int) {
 	command := make(chan pomodoroCommand)
 
 	if config.EnableAPI {
-		go runServer(config, command)
+		go runServer(config, command, &pom)
 	}
 
 	// vim-style key chords:
