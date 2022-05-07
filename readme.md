@@ -1,6 +1,7 @@
 # pom
 
-*pom* is a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer with vim keybindings, scriptable hooks, tmux support and json logging.
+*pom* is a command line [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique)
+timer with vim keybindings, scriptable hooks, web API, tmux support and json logging.
 
 ![image](https://user-images.githubusercontent.com/173962/166680550-d70ed16a-bc93-414e-bf04-ad42abcf9f96.png)
 
@@ -14,6 +15,7 @@
   * [hook profiles](#hook-profiles)
   * [show status in tmux](#show-status-in-tmux)
   * [JSON logging](#json-logging)
+  * [Web API](#web-api)
 
 <!-- vim-markdown-toc -->
 
@@ -122,3 +124,11 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
   },
 ...
 ```
+
+### Web API
+
+* disabled by default, edit `~/.config/pom/config.json`'s `enableAPI` to activate this feature
+* the API is still quite rudimentary
+* there are two endpoints that respond with JSON
+  * GET `/continue`: starts the next state (same as pressing `;`)
+  * GET `/ws`: upgrades connection to a websocket and streams infos about the current pomodoro twice a second

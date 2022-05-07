@@ -10,6 +10,6 @@
   "logJSON": true,
   "hideHeader": false,
   "hideFooter": false,
-  "enableAPI": true,
+  "enableAPI": false,
   "server": "0.0.0.0:8421"
 }
