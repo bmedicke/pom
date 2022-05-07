@@ -149,3 +149,7 @@ websocat ws://localhost:8421/ws | jq
 }
 ...
 ```
+
+```sh
+curl localhost:8421/continue # or call it from a bookmark, your phone, etc.
+```
