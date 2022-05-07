@@ -4,12 +4,10 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/bmedicke/bhdr/util"
 	"github.com/gdamore/tcell/v2"
-	"github.com/labstack/echo/v4"
 	"github.com/rivo/tview"
 )
 
@@ -20,17 +18,12 @@ func spawnTUI(config Config, longBreakIn int) {
 	app := tview.NewApplication()
 	pom := createPomodoro(config, longBreakIn)
 
-	// API:
-	if config.EnableAPI {
-		server := echo.New()
-		server.GET("/", func(c echo.Context) error {
-			return c.String(http.StatusOK, "hello world")
-		})
-		go server.Start(config.Server)
-	}
-
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
+
+	if config.EnableAPI {
+		go runServer(config, command)
+	}
 
 	// vim-style key chords:
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
