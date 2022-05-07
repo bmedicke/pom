@@ -21,6 +21,10 @@ func spawnTUI(config Config, longBreakIn int) {
 	// used for updating the pomodoro from goroutines:
 	command := make(chan pomodoroCommand)
 
+	if config.EnableAPI {
+		go runServer(config, command, &pom)
+	}
+
 	// vim-style key chords:
 	chord := util.KeyChord{Active: false, Buffer: "", Action: ""}
 	chordmap := map[string]interface{}{}
@@ -125,7 +129,7 @@ func createBodytable(bodytable *tview.Table, config Config) {
 			"type":     "editable",
 			"value":    config.DefaultNote,
 		},
-		{"id": "server", "value": "0.0.0.0:8421/api"},
+		{"id": "server", "value": config.Server},
 	}
 	cols, rows := 3, len(b)
 
