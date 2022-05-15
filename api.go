@@ -21,6 +21,8 @@ func runServer(config Config, command chan pomodoroCommand, pom *pomodoro) {
 	server.HideBanner = true
 	server.Logger.SetLevel(log.OFF)
 
+	server.Static("/live", "static/")
+
 	server.GET("/continue", func(c echo.Context) error {
 		command <- pomodoroCommand{commandtype: "continue"}
 		return c.String(http.StatusOK, `{"status":"command_sent"}`)
