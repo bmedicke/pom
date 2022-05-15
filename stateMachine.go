@@ -19,6 +19,7 @@ type pomodoro struct {
 	Task                        string
 	Note                        string
 	Duration                    time.Duration
+	Remaining                   time.Duration
 	StartTime                   time.Time
 	State                       string
 	StopTime                    time.Time
@@ -101,12 +102,13 @@ func handlePomodoroState(
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
-			remaining := (*pom).Duration - delta
-			if remaining <= 0 {
+			(*pom).Remaining = (*pom).Duration - delta
+			if (*pom).Remaining <= 0 {
 				statusbar.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
+				(*pom).Remaining = 0
 
 				(*pom).pomodorosUntilLongBreakLeft--
 				if (*pom).pomodorosUntilLongBreakLeft == 0 {
@@ -119,7 +121,7 @@ func handlePomodoroState(
 					go logPomodoro(*pom)
 				}
 			} else {
-				(*pom).durationLeft = remaining
+				(*pom).durationLeft = (*pom).Remaining
 			}
 		case "work_done":
 			if (*pom).pomodorosUntilLongBreakLeft == 0 {
