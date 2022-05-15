@@ -12,7 +12,10 @@ import (
 
 func runServer(config Config, command chan pomodoroCommand, pom *pomodoro) {
 	server := echo.New()
-	upgrader := websocket.Upgrader{}
+	// allow cross origin requests:
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool { return true },
+	}
 
 	// silence the server:
 	server.HideBanner = true
