@@ -1,9 +1,11 @@
-'use strict'
+"use strict";
 
-function timer(props) {
-  return <h1>Hello world</h1>
-}
-
-const domContainer = document.querySelector("#timer_container")
-const root = ReactDOM.createRoot(domContainer)
-root.render(React.createElement(timer))
+const ws = new WebSocket("ws://192.168.8.171:8421/ws");
+ws.addEventListener("message", (event) => {
+  const payload = JSON.parse(event.data);
+  var seconds = payload.Remaining / 1e9;
+  const minutes = Math.floor(seconds / 60);
+  seconds = Math.floor(seconds - minutes * 60);
+  seconds = String(seconds).padStart(2, "0");
+  document.title = `${minutes}:${seconds} ${payload.State}`;
+});
