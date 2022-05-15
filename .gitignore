@@ -1,6 +1,7 @@
 ### https://raw.github.com/github/gitignore/3bb7b4b767f3f8df07e362dfa03c8bd425f16d32/Go.gitignore
 
 pom
+pomweb
 
 # Binaries for programs and plugins
 *.exe

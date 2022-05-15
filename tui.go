@@ -188,7 +188,7 @@ func updateHeader(
 
 	for {
 		<-tick
-		timeleft := (*pom).durationLeft.Round(time.Second)
+		timeleft := (*pom).DurationLeft.Round(time.Second)
 		timer := fmt.Sprintf("[%6v]", timeleft)
 
 		right.SetText(fmt.Sprintf("%18v %8v", (*pom).State, timer))

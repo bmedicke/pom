@@ -28,7 +28,7 @@ type pomodoro struct {
 	longBreakDuration           time.Duration
 	pomodorosUntilLongBreak     int
 	pomodorosUntilLongBreakLeft int
-	durationLeft                time.Duration
+	DurationLeft                time.Duration
 	waiting                     bool
 }
 
@@ -89,6 +89,7 @@ func handlePomodoroState(
 
 		// non-blocking command handling:
 		handlePomodoroCommand(command, pom, config, app)
+		var remaining time.Duration
 
 		// state handling:
 		if (*pom).waiting {
@@ -101,7 +102,7 @@ func handlePomodoroState(
 			(*pom).StartTime = time.Now()
 		case "work":
 			delta := time.Now().Sub((*pom).StartTime)
-			remaining := (*pom).Duration - delta
+			remaining = (*pom).Duration - delta
 			if remaining <= 0 {
 				statusbar.SetText(executeShellHook("work_done"))
 				(*pom).State = "work_done"
@@ -110,16 +111,16 @@ func handlePomodoroState(
 
 				(*pom).pomodorosUntilLongBreakLeft--
 				if (*pom).pomodorosUntilLongBreakLeft == 0 {
-					(*pom).durationLeft = (*pom).longBreakDuration
+					(*pom).DurationLeft = (*pom).longBreakDuration
 				} else {
-					(*pom).durationLeft = (*pom).breakDuration
+					(*pom).DurationLeft = (*pom).breakDuration
 				}
 
 				if config.LogJSON {
 					go logPomodoro(*pom)
 				}
 			} else {
-				(*pom).durationLeft = remaining
+				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
 			if (*pom).pomodorosUntilLongBreakLeft == 0 {
@@ -133,7 +134,6 @@ func handlePomodoroState(
 			(*pom).breakStartTime = time.Now()
 		case "break", "longbreak":
 			delta := time.Now().Sub((*pom).breakStartTime)
-			var remaining time.Duration
 
 			if (*pom).State == "longbreak" {
 				remaining = (*pom).longBreakDuration - delta
@@ -152,18 +152,18 @@ func handlePomodoroState(
 
 				(*pom).breakStopTime = time.Now()
 
-				(*pom).durationLeft = (*pom).Duration
+				(*pom).DurationLeft = (*pom).Duration
 				if (*pom).pomodorosUntilLongBreakLeft == 0 {
 					(*pom).pomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
 				}
 
 				(*pom).waiting = true
 			} else {
-				(*pom).durationLeft = remaining
+				(*pom).DurationLeft = remaining
 			}
 		case "break_done", "longbreak_done":
 			(*pom).State = "ready"
-			(*pom).durationLeft = (*pom).Duration
+			(*pom).DurationLeft = (*pom).Duration
 		}
 	}
 }
@@ -185,7 +185,7 @@ func writeTmuxFile(pom *pomodoro) {
 			fmt.Sprintf(
 				"%s %s",
 				(*pom).State,
-				(*pom).durationLeft.Round(time.Second),
+				(*pom).DurationLeft.Round(time.Second),
 			),
 		)
 	}
@@ -263,7 +263,7 @@ func createPomodoro(config Config, longBreakIn int) pomodoro {
 		Duration:                    pomodoroDuration,
 		breakDuration:               breakDuration,
 		longBreakDuration:           longBreakDuration,
-		durationLeft:                pomodoroDuration,
+		DurationLeft:                pomodoroDuration,
 		pomodorosUntilLongBreak:     longBreakAfterPomodoros,
 		pomodorosUntilLongBreakLeft: longBreakIn,
 		waiting:                     true,

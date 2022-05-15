@@ -137,6 +137,7 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
 * there are two endpoints that respond with JSON
   * GET `/continue`: starts the next state (same as pressing `;`)
   * GET `/ws`: upgrades connection to a websocket and streams infos about the current pomodoro twice a second
+  * GET `/live`: open in browser to have a tab with current timestamp in the title
 
 ```sh
 websocat ws://localhost:8421/ws | jq
