@@ -56,6 +56,9 @@ func handlePomodoroCommand(
 					logPomodoro(*pom)
 				}
 				executeShellHook("pomodoro_cancelled")
+				time.Sleep(
+					300 * time.Millisecond,
+				) // give WS client a chance to catch final message.
 			}
 			app.Stop()
 		case "update_project":
