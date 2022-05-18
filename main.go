@@ -12,15 +12,19 @@ import (
 	"path/filepath"
 )
 
+//go:embed config.json
+var defaultConfigContent string
+
 //go:embed hooks/default.sh
 var defaultHookContent string
 
-//go:embed config.json
-var defaultConfigContent string
+//go:embed static/index.html
+var defaultIndexContent string
 
 const (
 	configfolder = ".config/pom"
 	configname   = "config.json"
+	staticfolder = "static/"
 )
 
 var hookfolder = "hooks/"
@@ -83,7 +87,14 @@ func createConfigFilesAndFolders() {
 
 	// create config folders:
 	hookpath := filepath.Join(home, configfolder, hookfolder)
+	staticpath := filepath.Join(home, configfolder, staticfolder)
+
 	err = os.MkdirAll(hookpath, 0700)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = os.MkdirAll(staticpath, 0700)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -117,6 +128,15 @@ func createConfigFilesAndFolders() {
 			f.WriteString(defaultHookContent)
 			os.Chmod(file, 0700) // make it executable.
 		}
+	}
+
+	// create index.html:
+	file := filepath.Join(staticpath, "index.html")
+	_, err = os.Stat(file)
+	if errors.Is(err, os.ErrNotExist) {
+		f, _ := os.Create(file)
+		defer f.Close()
+		f.WriteString(defaultIndexContent)
 	}
 
 	fmt.Println("the config folder can be found at: ~/.config/pom/")

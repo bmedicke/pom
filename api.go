@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -21,11 +24,25 @@ func runServer(config Config, command chan pomodoroCommand, pom *pomodoro) {
 	server.HideBanner = true
 	server.Logger.SetLevel(log.OFF)
 
-	server.Static("/live", "static/")
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	server.Static("/live", filepath.Join(home, ".config/pom/static"))
+
+	server.GET("/state", func(c echo.Context) error {
+		return c.String(http.StatusOK, getStatusJSON(pom))
+	})
+
+	server.POST("/continue", func(c echo.Context) error {
+		command <- pomodoroCommand{commandtype: "continue"}
+		return c.String(http.StatusOK, getStatusJSON(pom))
+	})
 
 	server.GET("/continue", func(c echo.Context) error {
 		command <- pomodoroCommand{commandtype: "continue"}
-		return c.String(http.StatusOK, `{"status":"command_sent"}`)
+		return c.String(http.StatusOK, getStatusJSON(pom))
 	})
 
 	server.GET("/ws", func(c echo.Context) error {
@@ -41,4 +58,8 @@ func runServer(config Config, command chan pomodoroCommand, pom *pomodoro) {
 	})
 
 	server.Start(config.Server)
+}
+
+func getStatusJSON(pom *pomodoro) string {
+	return `{"active":` + strconv.FormatBool(!(*pom).waiting) + `}`
 }
