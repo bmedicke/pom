@@ -16,6 +16,7 @@ timer with vim keybindings, scriptable hooks, a web API, tmux support and json l
   * [show status in tmux](#show-status-in-tmux)
   * [JSON logging](#json-logging)
   * [Web API](#web-api)
+    * [home-assistant example](#home-assistant-example)
 
 <!-- vim-markdown-toc -->
 
@@ -135,9 +136,11 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
 * disabled by default, edit `~/.config/pom/config.json`'s `enableAPI` to activate this feature
 * the API is still quite rudimentary
 * there are two endpoints that respond with JSON
-  * GET `/continue`: starts the next state (same as pressing `;`)
+  * POST/GET `/continue`: starts the next state (same as pressing `;`)
+  * GET `/state`: returns json object that shows if a break or pom is in progress
   * GET `/ws`: upgrades connection to a websocket and streams infos about the current pomodoro twice a second
-  * GET `/live`: open in browser to have a tab with current timestamp in the title
+  * GET `/live`: open in browser to have a tab with the current timestamp in the title
+    * you can edit this script at: `~config/pom/static`
 
 ```sh
 websocat ws://localhost:8421/ws | jq
@@ -158,4 +161,18 @@ websocat ws://localhost:8421/ws | jq
 
 ```sh
 curl localhost:8421/continue # or call it from a bookmark, your phone, etc.
+```
+
+#### home-assistant example
+
+* here's an example for a minimalist home-assistant REST switch
+
+**configuration.yml**
+```yaml
+switch:
+  - platform: rest
+    name: pom
+    resource: http://localhost:8421/continue
+    state_resource: http://localhost:8421/state
+    is_on_template: '{{ value_json.active }}'
 ```
