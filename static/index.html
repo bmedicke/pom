@@ -1,29 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>pom</title>
-  </head>
-  <body>
-    <h1 id="timer">pom</h1>
-    <script charset="utf-8">
-      "use strict"
-      const connect = () => {
-        const ws = new WebSocket("ws://localhost:8421/ws")
-        ws.onclose = () => { connect() }
-        ws.onmessage = (event) => {
-          const payload = JSON.parse(event.data)
-          var seconds = payload.DurationLeft / 1e9
-          const minutes = Math.floor(seconds / 60)
-          seconds = Math.floor(seconds - minutes * 60)
-          seconds = String(seconds).padStart(2, "0")
-          const current = `${minutes}:${seconds} ${payload.State}`
-          document.title = current
-          document.getElementById("timer").innerHTML = current
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width"/>
+        <title>pom</title>
+       <script type="text/javascript" charset="utf-8">
+            "use strict"
+            
+            const connect = (link) => {
+                link = link.replace("https://","").replace("/","");
+                const ws = new WebSocket(`ws://${link}/ws`);
+				   ws.onclose = () => connect(link);
+
+                try{
+                    ws.onmessage = (event)=> {
+                    const payload = JSON.parse(event.data)
+                    var seconds = payload.DurationLeft / 1e9
+                    const minutes = Math.floor(seconds / 60)
+                    seconds = Math.floor(seconds - minutes * 60)
+                    seconds = String(seconds).padStart(2, "0")
+                    const current = `${minutes}:${seconds} ${payload.State}`
+                    document.title = current
+                    document.getElementById("timer").innerHTML = current
+                } 
+                }catch(e){
+                    console.log(e)
+                }
+            }
+        </script>
+        
+    </head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap'); body {
+            background: black;
+            color: white;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3vw;
+            font-family: 'Lato', sans-serif;
         }
-      }
-      connect()
-    </script>
-  </body>
+
+        #timer {
+            border: 1px solid white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-flow: column wrap;
+        }
+    </style>
+    <body onload="connect('localhost:8421')">
+        <div class="wrapper">
+            <h1 id="timer">pom</h1>
+            <input type="text" id="url" value="test"/>
+            <button onclick="connect(document.querySelector('#url').value)">Go</button>
+        </div>
+    </body>
 </html>
