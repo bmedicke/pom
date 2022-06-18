@@ -25,6 +25,8 @@
             const current = `${minutes}:${seconds} ${payload.State}`;
             document.title = current;
             document.getElementById("timer").innerHTML = current;
+            document.getElementById("status").className = "status";
+            document.getElementById("connectionField").className = "hide";
           };
         } catch (e) {
           console.log(e);
@@ -34,6 +36,13 @@
   </head>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Inconsolata&display=swap");
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
     body {
       background: black;
       color: white;
@@ -43,7 +52,8 @@
       justify-content: center;
       align-items: center;
       font-size: 3vw;
-      font-family: "Lato", sans-serif;
+      font-family: "Inconsolata", monospace;
+      position: relative;
     }
 
     #timer {
@@ -52,18 +62,41 @@
       text-align: center;
     }
 
+    #connectionField {
+      display: inline-flex;
+      flex-flow: column wrap;
+      width: 100%;
+      background: red;
+    }
+
     .wrapper {
       display: flex;
       flex-flow: column wrap;
+      /* position: relative; */
+    }
+
+    .hide {
+      display: none !important;
+    }
+
+    #status {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      color: #ffffffaa;
+      font-size: 1rem;
     }
   </style>
   <body onload="connect('localhost:8421')">
     <div class="wrapper">
       <h1 id="timer">pom</h1>
-      <input type="text" id="url" value="" />
-      <button onclick="connect(document.querySelector('#url').value)">
-        Go
-      </button>
+      <div id="connectionField">
+        <input type="text" id="url" value="" />
+        <button onclick="connect(document.querySelector('#url').value)">
+          Go
+        </button>
+      </div>
+      <span id="status" class="status hide">Connection established</span>
     </div>
   </body>
 </html>
