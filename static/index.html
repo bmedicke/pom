@@ -22,9 +22,15 @@
             const minutes = Math.floor(seconds / 60);
             seconds = Math.floor(seconds - minutes * 60);
             seconds = String(seconds).padStart(2, "0");
+
             const current = `${minutes}:${seconds} ${payload.State}`;
             document.title = current;
             document.getElementById("timer").innerHTML = current;
+
+            const details = `${payload.Project} <br/>
+                             ${payload.Task} <br/>
+                             ${payload.Note}`;
+            document.getElementById("details").innerHTML = details;
             document.getElementById("status").className = "status";
             document.getElementById("connectionField").className = "hide";
           };
@@ -51,28 +57,40 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 3vw;
       font-family: "Inconsolata", monospace;
       position: relative;
     }
 
     #timer {
+      opacity: 0.8;
       border: 1px solid white;
       padding: 1rem;
+      font-size: 6rem;
       text-align: center;
+    }
+
+    #details {
+      opacity: 0;
+      padding: 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 200;
+      transition: all 0.5s ease-in-out;
+    }
+
+    #timer:hover ~ #details {
+      opacity: 0.3;
     }
 
     #connectionField {
       display: inline-flex;
       flex-flow: column wrap;
       width: 100%;
-      background: red;
     }
 
     .wrapper {
       display: flex;
       flex-flow: column wrap;
-      /* position: relative; */
     }
 
     .hide {
@@ -83,13 +101,15 @@
       position: absolute;
       bottom: 0;
       left: 0;
-      color: #ffffffaa;
-      font-size: 1rem;
+      font-size: 2.5vh;
+      opacity: 0.3;
+      padding: 1px;
     }
   </style>
   <body onload="connect('localhost:8421')">
     <div class="wrapper">
       <h1 id="timer">pom</h1>
+      <h2 id="details"></h2>
       <div id="connectionField">
         <input type="text" id="url" value="" />
         <button onclick="connect(document.querySelector('#url').value)">
