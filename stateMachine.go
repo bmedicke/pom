@@ -27,7 +27,7 @@ type pomodoro struct {
 	breakStopTime               time.Time
 	longBreakDuration           time.Duration
 	pomodorosUntilLongBreak     int
-	pomodorosUntilLongBreakLeft int
+	PomodorosUntilLongBreakLeft int
 	DurationLeft                time.Duration
 	waiting                     bool
 }
@@ -112,8 +112,8 @@ func handlePomodoroState(
 				(*pom).StopTime = time.Now()
 				(*pom).waiting = true
 
-				(*pom).pomodorosUntilLongBreakLeft--
-				if (*pom).pomodorosUntilLongBreakLeft == 0 {
+				(*pom).PomodorosUntilLongBreakLeft--
+				if (*pom).PomodorosUntilLongBreakLeft == 0 {
 					(*pom).DurationLeft = (*pom).longBreakDuration
 				} else {
 					(*pom).DurationLeft = (*pom).breakDuration
@@ -126,7 +126,7 @@ func handlePomodoroState(
 				(*pom).DurationLeft = remaining
 			}
 		case "work_done":
-			if (*pom).pomodorosUntilLongBreakLeft == 0 {
+			if (*pom).PomodorosUntilLongBreakLeft == 0 {
 				statusbar.SetText(executeShellHook("longbreak_start"))
 				(*pom).State = "longbreak"
 			} else {
@@ -156,8 +156,8 @@ func handlePomodoroState(
 				(*pom).breakStopTime = time.Now()
 
 				(*pom).DurationLeft = (*pom).Duration
-				if (*pom).pomodorosUntilLongBreakLeft == 0 {
-					(*pom).pomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
+				if (*pom).PomodorosUntilLongBreakLeft == 0 {
+					(*pom).PomodorosUntilLongBreakLeft = (*pom).pomodorosUntilLongBreak
 				}
 
 				(*pom).waiting = true
@@ -268,7 +268,7 @@ func createPomodoro(config Config, longBreakIn int) pomodoro {
 		longBreakDuration:           longBreakDuration,
 		DurationLeft:                pomodoroDuration,
 		pomodorosUntilLongBreak:     longBreakAfterPomodoros,
-		pomodorosUntilLongBreakLeft: longBreakIn,
+		PomodorosUntilLongBreakLeft: longBreakIn,
 		waiting:                     true,
 	}
 	return pom

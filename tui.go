@@ -200,10 +200,10 @@ func updateHeader(
 		} else {
 			leftstatus = fmt.Sprint(
 				"long break in ",
-				(*pom).pomodorosUntilLongBreakLeft,
+				(*pom).PomodorosUntilLongBreakLeft,
 				" pom",
 			)
-			if (*pom).pomodorosUntilLongBreakLeft > 1 {
+			if (*pom).PomodorosUntilLongBreakLeft > 1 {
 				leftstatus += "s"
 			}
 		}
