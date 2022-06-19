@@ -23,8 +23,8 @@
             seconds = Math.floor(seconds - minutes * 60);
             seconds = String(seconds).padStart(2, "0");
 
-            const current = `${minutes}:${seconds} ${payload.State}`;
-            document.title = current;
+            const current = `${minutes}:${seconds} [${payload.State}]`;
+            document.title = `${current} ${payload.PomodorosUntilLongBreakLeft}x`;
             document.getElementById("timer").innerHTML = current;
 
             const details = `${payload.Project} <br/>
