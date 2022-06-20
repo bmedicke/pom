@@ -178,3 +178,6 @@ switch:
     state_resource: http://localhost:8421/state
     is_on_template: '{{ value_json.active }}'
 ```
+
+![image](https://user-images.githubusercontent.com/173962/174577871-94716f32-bdb4-4eab-bcf1-3adaa77b0822.png)
+
