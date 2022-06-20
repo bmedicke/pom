@@ -142,6 +142,8 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
   * GET `/live`: open in browser to have a tab with the current timestamp in the title
     * you can edit this script at: `~config/pom/static`
 
+![image](https://user-images.githubusercontent.com/173962/174577083-91933f53-b0f1-4325-ae56-1020e17817e2.png)
+
 ```sh
 websocat ws://localhost:8421/ws | jq
 ```
