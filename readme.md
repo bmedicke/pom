@@ -140,7 +140,7 @@ set -g status-right "[#(cat ~/.config/pom/tmux)]"
   * GET `/state`: returns json object that shows if a break or pom is in progress
   * GET `/ws`: upgrades connection to a websocket and streams infos about the current pomodoro twice a second
   * GET `/live`: open in browser to have a tab with the current timestamp in the title
-    * you can edit this script at: `~config/pom/static`
+    * you can edit this script at: `~/.config/pom/static`
 
 ![image](https://user-images.githubusercontent.com/173962/174577083-91933f53-b0f1-4325-ae56-1020e17817e2.png)
 
